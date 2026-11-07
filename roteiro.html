@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#002048">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Rota Caruá">
+    <title>Meu roteiro - ROTA CARUÁ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icone-192.png">
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="img/logo-rota-carua.jpg" alt="Rota Caruá">
+        </a>
+
+        <nav class="navigation">
+            <a href="index.html">Explorar</a>
+            <a href="roteiro.html" class="active">Meu roteiro</a>
+            <a href="cupons.html" id="nav-cupons">Cupons</a>
+        </nav>
+
+        <div class="header-actions">
+            <span id="nome-usuario" class="user-name" hidden></span>
+            <button type="button" id="btn-sair" class="btn btn-login" hidden>Sair</button>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login">Entrar</a>
+        </div>
+    </header>
+
+    <main class="pagina-cupons">
+        <section class="auth-section pagina-interna">
+            <div class="auth-container caixa-larga">
+                <span class="section-tag">SEU PASSEIO</span>
+                <h2>Meu roteiro</h2>
+                <p>Escolha a ordem no seletor de cada local. Essa ordem aparece numerada no mapa de Explorar.</p>
+                <p id="roteiro-vazio" hidden>Seu roteiro ainda esta vazio. Va em Explorar, abra um local e clique em Adicionar ao roteiro.</p>
+                <div id="lista-roteiro" class="lista-roteiro-ordenavel"></div>
+                <div id="acoes-roteiro" class="acoes-roteiro" hidden>
+                    <a href="index.html#explorar" class="btn btn-primary">Ver no mapa</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="nav-mobile" aria-label="Menu principal">
+        <a href="index.html" class="nav-mobile-item">Explorar</a>
+        <a href="roteiro.html" class="nav-mobile-item active">Roteiro</a>
+        <a href="cupons.html" class="nav-mobile-item">Cupons</a>
+    </nav>
+
+    <footer class="footer footer-mobile-safe">
+        <div class="footer-bottom">
+            <p>© 2026 ROTA CARUÁ</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/roteiro.js"></script>
+    <script src="js/roteiro-pagina.js"></script>
+</body>
+
+</html>

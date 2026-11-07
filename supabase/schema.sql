@@ -39,7 +39,6 @@ create table if not exists public.cupons (
     validado_por uuid references auth.users(id)
 );
 
--- quando cria usuario no auth, cria o perfil tambem
 create or replace function public.ao_criar_usuario()
 returns trigger as $$
 begin

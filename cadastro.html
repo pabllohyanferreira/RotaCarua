@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#002048">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Rota Caruá">
+    <title>Cadastro - ROTA CARUÁ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icone-192.png">
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="img/logo-rota-carua.jpg" alt="Rota Caruá">
+        </a>
+        <a href="login.html" class="btn btn-login">Entrar</a>
+    </header>
+
+    <main>
+        <section class="auth-section">
+            <div class="auth-container">
+                <img src="img/logo-rota-carua.jpg" alt="Rota Caruá" class="logo-auth">
+                <span class="section-tag">FAÇA PARTE DO ROTA CARUÁ</span>
+                <h2>Crie sua conta</h2>
+                <p>Cadastre-se para descobrir estabelecimentos, montar roteiros e aproveitar benefícios.</p>
+
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="name">Nome completo</label>
+                        <input type="text" id="name" placeholder="Digite seu nome" autocomplete="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" placeholder="Digite seu e-mail" autocomplete="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="Crie uma senha" autocomplete="new-password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar senha</label>
+                        <input type="password" id="confirmPassword" placeholder="Digite a senha novamente" autocomplete="new-password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Criar conta</button>
+                </form>
+
+                <p class="auth-link">
+                    Já possui uma conta?
+                    <a href="login.html">Faça login</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('registerForm').onsubmit = async function (e) {
+            e.preventDefault();
+            var senha = document.getElementById('password').value;
+            var confirma = document.getElementById('confirmPassword').value;
+            if (senha !== confirma) {
+                alert('As senhas nao batem');
+                return;
+            }
+            if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+                alert('Senha com no minimo 8 caracteres, letras e numeros');
+                return;
+            }
+            var ok = await fazerCadastro(
+                document.getElementById('name').value,
+                document.getElementById('email').value,
+                senha
+            );
+            if (ok) {
+                window.location.href = 'index.html';
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+
+</html>

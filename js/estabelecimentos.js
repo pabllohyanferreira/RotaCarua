@@ -59,5 +59,6 @@ function nomeCategoria(cat) {
     if (cat === 'moda') return 'Moda';
     if (cat === 'servicos') return 'Servicos';
     if (cat === 'cultura') return 'Cultura';
+    if (cat === 'todos') return 'Geral';
     return cat;
 }

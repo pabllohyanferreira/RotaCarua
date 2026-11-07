@@ -1,77 +1,51 @@
 # Rota Caruá
 
-App de turismo inteligente para descobrir comércio, cultura e benefícios no Centro de Caruaru (entorno da Estação Ferroviária e do Armazém da Criatividade).
+App de descoberta do Centro de Caruaru (entorno da Estação Ferroviária e do Armazém / Pátio).
+
+## Telas do MVP (regulamento)
+
+1. **Login** (`login.html`) — autenticação  
+2. **Explorar** (`index.html`) — mapa, filtros, lista e ficha  
+3. **Cupons** (`cupons.html`) — listar cupons + validar (comércio)  
+4. **Meu roteiro** (`roteiro.html`) — locais salvos + abrir no Maps
+
+Layout mobile com menu inferior (Explorar / Roteiro / Cupons).
+
+Cadastro: `cadastro.html`
+
+## Area do mapa
+
+Busca limitada ao polígono do Centro (Estação, ACIC, Pátio Luiz Gonzaga).  
+O Places usa círculo na API e depois filtra os pontos dentro do polígono (`js/area.js`).
 
 ## Stack
 
-- HTML, CSS, JavaScript
-- Supabase (Auth + Postgres)
-- PWA
-
-## Estrutura
-
-```
-/
-├── index.html
-├── css/style.css
-├── js/
-│   ├── config.js
-│   ├── auth.js
-│   ├── estabelecimentos.js
-│   ├── cupons.js
-│   ├── mapa.js
-│   └── app.js
-├── supabase/
-│   ├── schema.sql
-│   └── seed.sql
-├── icons/
-├── manifest.json
-└── sw.js
-```
+- HTML / CSS / JS
+- Supabase (login, parceiros, cupons)
+- Google Maps + Places API (New) — chave em `js/config.js`
 
 ## Como rodar
 
-1. Abra com Live Server (ou `npx serve .`)
-2. Login de demo:
+1. Live Server  
+2. Demo:
+   - `usuario@gmail.com` / `123456` (visitante)
+   - `adm@gmail.com` / `123456` (comercio)
 
-| Perfil    | E-mail             | Senha  |
-|-----------|--------------------|--------|
-| Visitante | usuario@gmail.com  | 123456 |
-| Comércio  | adm@gmail.com      | 123456 |
+## Piloto vs evolucao (doc de requisitos)
 
-## Fluxo da demo
+| ID | Status |
+|----|--------|
+| RF01 Login/cadastro | OK |
+| RF02 Menu | Parcial (header) |
+| RF03 Mapa + filtros | OK |
+| RF04 Ficha | OK (foto depois) |
+| RF05 Rota | OK |
+| RF06 Resgate cupom | OK |
+| RF07 Validar cupom | OK |
+| RF08 Parceiros/beneficios | OK (seed) |
+| RF09 Relatorio | Evolucao |
+| RF10 Passaporte | Evolucao |
 
-1. Entrar como visitante
-2. Filtrar **Comer**
-3. Abrir um local e gerar cupom
-4. Sair e entrar como comércio
-5. Validar o código
-6. Conferir em **Table Editor → cupons**
+## Arquivos principais
 
-## Banco (Supabase)
-
-1. Rodar `supabase/schema.sql`
-2. Criar os usuários no Auth
-3. Rodar `supabase/seed.sql`
-4. Colocar URL + chave publishable/anon em `js/config.js`
-5. Criar chave da **Maps JavaScript API** no Google Cloud e colar em `GOOGLE_MAPS_KEY` no `js/config.js`
-
-Centro do mapa: Estação / Armazém da Criatividade (Caruaru). Os pins vêm dos `latitude`/`longitude` do Supabase.
-
-## MVP
-
-- Login
-- Mapa com filtros
-- Ficha do estabelecimento
-- Cupom digital + validação no banco
-- PWA
-
-## Fora do escopo
-
-Passaporte de visitas, AR, ranking, expansão para Feira / Alto do Moura / Polo.
-
-## Eixo R.O.M.A.
-
-Foco: **O — Oportunidades e comércio**
-
-Romathon 2026
+`js/config.js` · `auth.js` · `area.js` · `places.js` · `mapa.js` · `estabelecimentos.js` · `cupons.js` · `app.js`

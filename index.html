@@ -1,140 +1,153 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#19302A">
-    <meta name="description" content="Rota Caruá — descubra comércio, cultura e experiências no Centro de Caruaru.">
-    <title>Rota Caruá</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#002048">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rota Caruá">
+    <meta name="description" content="Rota Caruá — descubra comércio, cultura e experiências em Caruaru.">
+    <title>ROTA CARUÁ</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icone-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icone-192.png">
 </head>
+
 <body>
-    <!-- LOGIN -->
-    <section id="tela-login" class="tela">
-        <div class="caixa-login">
-            <p class="marca">ROTA CARUÁ</p>
-            <h1>Descubra o Centro</h1>
-            <p class="subtitulo">Comércio, cultura e benefícios perto da Estação e do Armazém da Criatividade.</p>
 
-            <form id="form-login">
-                <label for="campo-email">E-mail</label>
-                <input id="campo-email" type="email" autocomplete="username" required placeholder="seu@email.com">
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="img/logo-rota-carua.jpg" alt="Rota Caruá">
+        </a>
 
-                <label for="campo-senha">Senha</label>
-                <input id="campo-senha" type="password" autocomplete="current-password" required placeholder="••••••••">
+        <nav class="navigation">
+            <a href="index.html" class="active">Explorar</a>
+            <a href="roteiro.html" id="nav-roteiro">Meu roteiro</a>
+            <a href="cupons.html" id="nav-cupons">Cupons</a>
+        </nav>
 
-                <p id="msg-login" class="msg-erro" hidden></p>
-
-                <button type="submit" id="btn-entrar">Entrar</button>
-            </form>
-
-            <p class="dica-demo">Visitante: usuario@gmail.com / 123456</p>
-            <p class="dica-demo">Comercio: adm@gmail.com / 123456</p>
+        <div class="header-actions">
+            <span id="nome-usuario" class="user-name" hidden></span>
+            <button type="button" id="btn-validar-comercio" class="btn btn-secondary" hidden>Validar cupom</button>
+            <button type="button" id="btn-sair" class="btn btn-login" hidden>Sair</button>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login">Entrar</a>
         </div>
-    </section>
+    </header>
 
-    <!-- APP -->
-    <div id="tela-app" class="tela" hidden>
-        <header>
-            <div class="marca-header">
-                <h1>ROTA CARUÁ</h1>
-                <p>DESCUBRA O CENTRO</p>
+    <main>
+
+        <section class="hero">
+            <span class="section-tag">DESCUBRA O CENTRO DE CARUARU</span>
+            <h2>Diversas lojas e promoções aguardando por você!</h2>
+            <p>
+                Explore os melhores estabelecimentos e descubra
+                novas experiências pelo coração de Caruaru.
+            </p>
+            <a href="#explorar" class="btn btn-primary">Começar a explorar</a>
+        </section>
+
+        <section id="explorar" class="explore-section">
+
+            <div class="filters">
+                <button type="button" class="filter-button active" data-categoria="todos">Todos</button>
+                <button type="button" class="filter-button" data-categoria="alimentacao">Alimentação</button>
+                <button type="button" class="filter-button" data-categoria="artesanato">Artesanato</button>
+                <button type="button" class="filter-button" data-categoria="moda">Moda</button>
+                <button type="button" class="filter-button" data-categoria="servicos">Serviços</button>
+                <button type="button" class="filter-button" data-categoria="cultura">Cultura</button>
             </div>
-            <div class="acoes-header">
-                <span id="nome-usuario"></span>
-                <button type="button" id="btn-meus-cupons" class="btn-secundario">Meus cupons</button>
-                <button type="button" id="btn-validar-comercio" class="btn-secundario" hidden>Validar cupom</button>
-                <button type="button" id="btn-sair">Sair</button>
+
+            <div class="busca-box">
+                <input type="text" id="campo-busca" placeholder="Buscar lugar (ex: Faculdade Nova Roma Caruaru)">
+                <button type="button" id="btn-buscar" class="btn btn-primary">Buscar</button>
             </div>
-        </header>
 
-        <main>
-            <!-- MAPA / LISTA -->
-            <section id="painel-mapa">
-                <h2>O Centro está cheio de descobertas.</h2>
-                <p class="texto-apoio">Filtre por interesse, escolha um ponto e resgate um benefício no local.</p>
+            <div id="map" class="area-mapa">
+                <div id="mapa-google"></div>
+                <p id="mapa-vazio">Carregando mapa...</p>
+            </div>
+            <p id="status-localizacao" class="legenda-mapa texto-pequeno">Localizacao: aguardando...</p>
 
-                <nav id="filtros" aria-label="Filtros por categoria">
-                    <button type="button" data-categoria="todos" class="filtro ativo">Todos</button>
-                    <button type="button" data-categoria="alimentacao" class="filtro">Comer</button>
-                    <button type="button" data-categoria="artesanato" class="filtro">Artesanato</button>
-                    <button type="button" data-categoria="moda" class="filtro">Moda</button>
-                    <button type="button" data-categoria="servicos" class="filtro">Serviços</button>
-                    <button type="button" data-categoria="cultura" class="filtro">Cultura</button>
-                </nav>
-
-                <label class="check-acessivel">
-                    <input type="checkbox" id="filtro-acessivel">
-                    Só locais com informação de acessibilidade
-                </label>
-
-                <div id="mapa" class="area-mapa" aria-label="Mapa de estabelecimentos">
-                    <div id="mapa-google"></div>
-                    <p id="mapa-vazio">Carregando mapa...</p>
+            <section class="establishments-section">
+                <h2>Estabelecimentos</h2>
+                <div id="establishments-list">
+                    <p>Os estabelecimentos aparecerão aqui.</p>
                 </div>
             </section>
 
-            <!-- FICHA DO ESTABELECIMENTO -->
-            <section id="painel-ficha" hidden>
-                <button type="button" id="btn-voltar-mapa" class="btn-link">← Voltar ao mapa</button>
+            <section id="establishment-details">
+                <h2 id="establishmentName">Detalhes do estabelecimento</h2>
+                <p id="establishmentCategory"></p>
+                <p id="establishmentDescription">
+                    Selecione um estabelecimento para visualizar suas informações.
+                </p>
+                <p id="establishmentAddress"></p>
+                <p id="establishmentHours"></p>
+                <p id="establishmentRating"></p>
+                <p id="establishmentPhone"></p>
+                <p id="establishmentSite"></p>
 
-                <article id="ficha">
-                    <p id="ficha-categoria" class="chip"></p>
-                    <h2 id="ficha-nome"></h2>
-                    <p id="ficha-descricao"></p>
+                <div class="benefit-area" id="benefit-area" hidden>
+                    <h3>Benefício disponível</h3>
+                    <p id="establishmentBenefit"></p>
+                    <p id="establishmentBenefitRules" class="texto-pequeno"></p>
+                    <button type="button" id="btn-gerar-cupom" class="btn btn-primary">Resgatar benefício</button>
+                    <p id="msg-cupom" class="msg-info" hidden></p>
+                </div>
 
-                    <ul class="lista-info">
-                        <li><strong>Endereço:</strong> <span id="ficha-endereco"></span></li>
-                        <li><strong>Horário:</strong> <span id="ficha-horario"></span></li>
-                        <li><strong>Acessibilidade:</strong> <span id="ficha-acessibilidade"></span></li>
-                    </ul>
+                <div class="ficha-acoes">
+                    <a href="#" id="routeButton" class="btn btn-secondary" target="_blank" rel="noopener">Como chegar</a>
+                    <button type="button" id="btn-add-roteiro" class="btn btn-primary">Adicionar ao roteiro</button>
+                </div>
 
-                    <div id="bloco-beneficio" class="bloco-beneficio" hidden>
-                        <h3>Benefício disponível</h3>
-                        <p id="beneficio-titulo"></p>
-                        <p id="beneficio-regras" class="texto-pequeno"></p>
-                        <button type="button" id="btn-gerar-cupom">Gerar meu cupom</button>
-                    </div>
-
-                    <p id="msg-ficha" class="msg-info" hidden></p>
-
-                    <a id="btn-abrir-rota" class="btn-secundario" href="#" target="_blank" rel="noopener">Abrir caminho até aqui</a>
-                </article>
+                <div id="bloco-proximos" class="bloco-proximos" hidden>
+                    <h3>Perto daqui</h3>
+                    <p class="texto-pequeno">Sugestoes por distancia pra continuar o passeio.</p>
+                    <div id="lista-proximos"></div>
+                </div>
             </section>
 
-            <!-- MEUS CUPONS -->
-            <section id="painel-cupons" hidden>
-                <button type="button" id="btn-voltar-mapa-2" class="btn-link">← Voltar ao mapa</button>
-                <h2>Meus cupons</h2>
-                <div id="lista-cupons"></div>
-            </section>
+            <p class="legenda-mapa texto-pequeno">
+                No mapa: circulo = local · pin laranja numerado = parada do roteiro · linha = caminho sugerido · ponto azul = voce
+            </p>
 
-            <!-- VALIDAÇÃO (COMÉRCIO) -->
-            <section id="painel-validacao" hidden>
-                <button type="button" id="btn-voltar-mapa-3" class="btn-link">← Voltar</button>
-                <h2>Validar cupom</h2>
-                <p class="texto-apoio">Digite o código que o cliente apresentar no balcão.</p>
+        </section>
 
-                <form id="form-validacao">
-                    <label for="campo-codigo">Código do cupom</label>
-                    <input id="campo-codigo" type="text" required placeholder="Ex: RC-AB12CD" maxlength="20" style="text-transform: uppercase;">
-                    <button type="submit" id="btn-confirmar-validacao">Validar e registrar</button>
-                </form>
+    </main>
 
-                <p id="msg-validacao" class="msg-info" hidden></p>
-                <div id="resultado-validacao" hidden></div>
-            </section>
-        </main>
-    </div>
+    <nav class="nav-mobile" aria-label="Menu principal">
+        <a href="index.html" class="nav-mobile-item active">Explorar</a>
+        <a href="roteiro.html" id="nav-roteiro-mobile" class="nav-mobile-item">Roteiro</a>
+        <a href="cupons.html" id="nav-cupons-mobile" class="nav-mobile-item">Cupons</a>
+    </nav>
+
+    <footer class="footer footer-mobile-safe">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="img/logo-rota-carua.jpg" alt="Rota Caruá" class="logo-footer">
+                <p>Explore, descubra e valorize tudo que Caruaru tem a oferecer.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
+            <p>Feito para valorizar Caruaru.</p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/area.js"></script>
     <script src="js/estabelecimentos.js"></script>
     <script src="js/cupons.js"></script>
+    <script src="js/roteiro.js"></script>
+    <script src="js/places.js"></script>
     <script src="js/mapa.js"></script>
     <script src="js/app.js"></script>
 </body>
+
 </html>

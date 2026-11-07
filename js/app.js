@@ -1,37 +1,159 @@
 var filtroAtual = 'todos';
 var localAtual = null;
+var parceirosDb = [];
+var listaMapaAtual = [];
 
-function esconderTudo() {
-    document.getElementById('painel-mapa').hidden = true;
-    document.getElementById('painel-ficha').hidden = true;
-    document.getElementById('painel-cupons').hidden = true;
-    document.getElementById('painel-validacao').hidden = true;
-}
+function atualizarHeader() {
+    var nome = document.getElementById('nome-usuario');
+    var btnSair = document.getElementById('btn-sair');
+    var btnEntrar = document.getElementById('btn-entrar-header');
+    var btnValidar = document.getElementById('btn-validar-comercio');
 
-function irProMapa() {
-    esconderTudo();
-    document.getElementById('painel-mapa').hidden = false;
-    montarMapa();
-}
-
-function mostrarApp() {
-    document.getElementById('tela-login').hidden = true;
-    document.getElementById('tela-app').hidden = false;
-    document.getElementById('nome-usuario').textContent = usuario.nome;
-
-    if (usuario.tipo === 'comercio') {
-        document.getElementById('btn-validar-comercio').hidden = false;
+    if (usuario) {
+        nome.hidden = false;
+        nome.textContent = usuario.nome;
+        btnSair.hidden = false;
+        btnEntrar.hidden = true;
+        btnValidar.hidden = usuario.tipo !== 'comercio';
     } else {
-        document.getElementById('btn-validar-comercio').hidden = true;
+        nome.hidden = true;
+        btnSair.hidden = true;
+        btnEntrar.hidden = false;
+        btnValidar.hidden = true;
+    }
+}
+
+function irParaLogin(destino) {
+    var next = destino || 'index.html';
+    window.location.href = 'login.html?next=' + encodeURIComponent(next);
+}
+
+function precisaLogin(destino) {
+    if (usuario) {
+        return false;
+    }
+    irParaLogin(destino);
+    return true;
+}
+
+async function carregarParceiros() {
+    try {
+        var todos = await buscarLocais('todos', false);
+        parceirosDb = filtrarDentroDaArea(todos);
+    } catch (e) {
+        parceirosDb = [];
+    }
+}
+
+function acharParceiro(place) {
+    for (var i = 0; i < parceirosDb.length; i++) {
+        var p = parceirosDb[i];
+
+        if (p.nome && place.nome) {
+            var trecho = place.nome.toLowerCase().split(' ')[0];
+            if (p.nome.toLowerCase().indexOf(trecho) !== -1) {
+                return p;
+            }
+        }
+
+        if (p.lat && place.lat) {
+            var dLat = Math.abs(Number(p.lat) - Number(place.lat));
+            var dLng = Math.abs(Number(p.lng) - Number(place.lng));
+            if (dLat < 0.0008 && dLng < 0.0008) {
+                return p;
+            }
+        }
     }
 
-    irProMapa();
+    return null;
+}
+
+function atualizarBotaoRoteiro() {
+    var btn = document.getElementById('btn-add-roteiro');
+    if (!btn) return;
+
+    if (localAtual && estaNoRoteiro(localAtual)) {
+        btn.textContent = 'Ja esta no roteiro';
+        btn.disabled = true;
+    } else {
+        btn.textContent = 'Adicionar ao roteiro';
+        btn.disabled = false;
+    }
+}
+
+function montarProximos(origem) {
+    var bloco = document.getElementById('bloco-proximos');
+    var caixa = document.getElementById('lista-proximos');
+    if (!bloco || !caixa) return;
+
+    if (!origem || !listaMapaAtual.length) {
+        bloco.hidden = true;
+        return;
+    }
+
+    var sugestoes = locaisProximos(origem, listaMapaAtual, 4);
+
+    if (!sugestoes.length) {
+        bloco.hidden = true;
+        return;
+    }
+
+    bloco.hidden = false;
+    caixa.innerHTML = '';
+
+    for (var i = 0; i < sugestoes.length; i++) {
+        var item = sugestoes[i];
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'card-local card-proximo';
+        card.innerHTML =
+            '<strong>' + item.local.nome + '</strong>' +
+            '<span class="badge badge-distancia">' + formatarDistancia(item.metros) + '</span>' +
+            '<span>' + (item.local.endereco || '') + '</span>';
+
+        card.onclick = (function (l) {
+            return function () {
+                abrirFicha(l);
+            };
+        })(item.local);
+
+        caixa.appendChild(card);
+    }
+}
+
+function montarLista(lista) {
+    var caixa = document.getElementById('establishments-list');
+    caixa.innerHTML = '';
+
+    if (!lista.length) {
+        caixa.innerHTML = '<p>Nenhum estabelecimento nessa area.</p>';
+        return;
+    }
+
+    for (var i = 0; i < lista.length; i++) {
+        var item = lista[i];
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'card-local' + (estaNoRoteiro(item) ? ' no-roteiro' : '');
+        card.innerHTML =
+            '<strong>' + item.nome + '</strong>' +
+            (estaNoRoteiro(item) ? '<span class="badge badge-roteiro">No roteiro</span>' : '') +
+            (item.parceiro ? '<span class="badge">Parceiro</span>' : '') +
+            '<span>' + (item.endereco || '') + '</span>' +
+            (item.rating ? '<span>Nota: ' + item.rating + '</span>' : '');
+
+        card.onclick = (function (l) {
+            return function () {
+                abrirFicha(l);
+            };
+        })(item);
+
+        caixa.appendChild(card);
+    }
 }
 
 async function montarMapa() {
     var vazio = document.getElementById('mapa-vazio');
-    var soAcessivel = document.getElementById('filtro-acessivel').checked;
-
     vazio.hidden = false;
     vazio.textContent = 'Carregando mapa...';
 
@@ -42,181 +164,245 @@ async function montarMapa() {
         return;
     }
 
-    var lista = await buscarLocais(filtroAtual, soAcessivel);
+    var listaPlaces = [];
+    try {
+        listaPlaces = await buscarProximos(filtroAtual);
+    } catch (erro) {
+        console.log(erro);
+        listaPlaces = [];
+    }
 
-    if (lista.length === 0) {
-        limparMarcadores();
+    var listaFinal = [];
+
+    for (var i = 0; i < parceirosDb.length; i++) {
+        var p = parceirosDb[i];
+        if (filtroAtual === 'todos' || p.categoria === filtroAtual) {
+            p.origem = 'supabase';
+            p.parceiro = true;
+            listaFinal.push(p);
+        }
+    }
+
+    for (var j = 0; j < listaPlaces.length; j++) {
+        var place = listaPlaces[j];
+        var parceiro = acharParceiro(place);
+
+        if (parceiro) {
+            place.parceiro = true;
+            place.beneficio_id = parceiro.beneficio_id;
+            place.beneficio = parceiro.beneficio;
+            place.regras = parceiro.regras;
+            place.id = parceiro.id;
+        }
+
+        listaFinal.push(place);
+    }
+
+    if (!listaFinal.length) {
+        listaMapaAtual = [];
         vazio.hidden = false;
-        vazio.textContent = 'Nenhum local nessa categoria.';
+        vazio.textContent = 'Nenhum local nessa categoria dentro da area.';
+        colocarPins([]);
+        montarLista([]);
         return;
     }
 
+    listaMapaAtual = listaFinal;
     vazio.hidden = true;
-    colocarPins(lista);
+    colocarPins(listaFinal);
+    montarLista(listaFinal);
 }
 
-function abrirFicha(local) {
+async function abrirFicha(local) {
     localAtual = local;
-    esconderTudo();
-    document.getElementById('painel-ficha').hidden = false;
 
-    document.getElementById('ficha-categoria').textContent = nomeCategoria(local.categoria);
-    document.getElementById('ficha-nome').textContent = local.nome;
-    document.getElementById('ficha-descricao').textContent = local.descricao;
-    document.getElementById('ficha-endereco').textContent = local.endereco;
-    document.getElementById('ficha-horario').textContent = local.horario;
+    document.getElementById('establishmentName').textContent = local.nome;
+    document.getElementById('establishmentCategory').textContent = nomeCategoria(local.categoria || 'todos');
+    document.getElementById('establishmentDescription').textContent = local.descricao || local.endereco || '';
+    document.getElementById('establishmentAddress').textContent = local.endereco ? ('Endereco: ' + local.endereco) : '';
+    document.getElementById('establishmentHours').textContent = local.horario ? ('Horario: ' + local.horario) : '';
+    document.getElementById('establishmentRating').textContent = local.rating ? ('Nota: ' + local.rating) : '';
+    document.getElementById('establishmentPhone').textContent = '';
+    document.getElementById('establishmentSite').textContent = '';
+    document.getElementById('msg-cupom').hidden = true;
 
-    if (local.acessibilidade) {
-        document.getElementById('ficha-acessibilidade').textContent = local.acessibilidade;
-    } else {
-        document.getElementById('ficha-acessibilidade').textContent = 'Nao informado';
+    if (local.place_id) {
+        try {
+            var detalhe = await detalhesDoLugar(local.place_id);
+
+            if (detalhe.horario) {
+                document.getElementById('establishmentHours').textContent = 'Horario: ' + detalhe.horario;
+            }
+            if (detalhe.telefone) {
+                document.getElementById('establishmentPhone').textContent = 'Telefone: ' + detalhe.telefone;
+            }
+            if (detalhe.site) {
+                document.getElementById('establishmentSite').innerHTML =
+                    'Site: <a href="' + detalhe.site + '" target="_blank" rel="noopener">' + detalhe.site + '</a>';
+            }
+            if (detalhe.rating) {
+                var textoNota = 'Nota: ' + detalhe.rating;
+                if (detalhe.avaliacoes) {
+                    textoNota += ' (' + detalhe.avaliacoes + ' avaliacoes)';
+                }
+                document.getElementById('establishmentRating').textContent = textoNota;
+            }
+            if (detalhe.lat && detalhe.lng) {
+                local.lat = detalhe.lat;
+                local.lng = detalhe.lng;
+            }
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    document.getElementById('btn-abrir-rota').href =
-        'https://www.google.com/maps/dir/?api=1&destination=' + local.lat + ',' + local.lng;
-
-    document.getElementById('msg-ficha').hidden = true;
-
-    if (local.beneficio) {
-        document.getElementById('bloco-beneficio').hidden = false;
-        document.getElementById('beneficio-titulo').textContent = local.beneficio;
-        document.getElementById('beneficio-regras').textContent = local.regras;
-    } else {
-        document.getElementById('bloco-beneficio').hidden = true;
+    if (local.lat && local.lng) {
+        document.getElementById('routeButton').href =
+            'https://www.google.com/maps/dir/?api=1&destination=' + local.lat + ',' + local.lng;
     }
+
+    var beneficioBox = document.getElementById('benefit-area');
+    if (local.beneficio_id && local.beneficio) {
+        beneficioBox.hidden = false;
+        document.getElementById('establishmentBenefit').textContent = local.beneficio;
+        document.getElementById('establishmentBenefitRules').textContent = local.regras || '';
+    } else {
+        beneficioBox.hidden = true;
+    }
+
+    atualizarBotaoRoteiro();
+    montarProximos(local);
+    document.getElementById('establishment-details').scrollIntoView({ behavior: 'smooth' });
 }
 
-async function mostrarCupons() {
-    esconderTudo();
-    document.getElementById('painel-cupons').hidden = false;
+document.querySelector('.filters').onclick = function (e) {
+    var botao = e.target.closest('.filter-button');
+    if (!botao) return;
 
-    var caixa = document.getElementById('lista-cupons');
-    caixa.innerHTML = 'Carregando...';
+    filtroAtual = botao.getAttribute('data-categoria');
 
-    var lista = await meusCupons();
+    var botoes = document.querySelectorAll('.filter-button');
+    for (var i = 0; i < botoes.length; i++) {
+        botoes[i].classList.remove('active');
+    }
+    botao.classList.add('active');
 
-    if (lista.length === 0) {
-        caixa.innerHTML = '<p>Nenhum cupom ainda.</p>';
+    montarMapa();
+};
+
+document.getElementById('btn-buscar').onclick = async function () {
+    var texto = document.getElementById('campo-busca').value.trim();
+    if (!texto) {
+        alert('Digite algo pra buscar');
         return;
     }
 
-    caixa.innerHTML = '';
+    var vazio = document.getElementById('mapa-vazio');
+    vazio.hidden = false;
+    vazio.textContent = 'Buscando...';
 
-    for (var i = 0; i < lista.length; i++) {
-        var c = lista[i];
-        var div = document.createElement('div');
-        div.className = 'card-cupom status-' + c.status;
-        div.innerHTML =
-            '<p class="codigo">' + c.codigo + '</p>' +
-            '<h3>' + c.beneficio + '</h3>' +
-            '<p>' + c.local_nome + '</p>' +
-            '<p class="texto-pequeno">Status: ' + c.status + '</p>' +
-            '<p class="texto-pequeno">' + c.data + '</p>';
-        caixa.appendChild(div);
+    try {
+        await prepararMapa();
+        var lista = await buscarPorTexto(texto);
+        listaMapaAtual = lista;
+        vazio.hidden = true;
+        colocarPins(lista);
+        montarLista(lista);
+    } catch (erro) {
+        vazio.textContent = erro.message;
     }
-}
+};
 
-document.getElementById('form-login').onsubmit = async function (e) {
+document.getElementById('nav-cupons').onclick = function (e) {
     e.preventDefault();
+    if (precisaLogin('cupons.html')) return;
+    window.location.href = 'cupons.html';
+};
 
-    var email = document.getElementById('campo-email').value;
-    var senha = document.getElementById('campo-senha').value;
-    var msg = document.getElementById('msg-login');
+document.getElementById('nav-cupons-mobile').onclick = function (e) {
+    e.preventDefault();
+    if (precisaLogin('cupons.html')) return;
+    window.location.href = 'cupons.html';
+};
 
-    msg.hidden = true;
+document.getElementById('nav-roteiro').onclick = function (e) {
+    e.preventDefault();
+    if (precisaLogin('roteiro.html')) return;
+    window.location.href = 'roteiro.html';
+};
 
-    var ok = await fazerLogin(email, senha);
+document.getElementById('nav-roteiro-mobile').onclick = function (e) {
+    e.preventDefault();
+    if (precisaLogin('roteiro.html')) return;
+    window.location.href = 'roteiro.html';
+};
 
-    if (!ok) {
-        msg.hidden = false;
-        msg.textContent = 'Email ou senha errados';
+document.getElementById('btn-add-roteiro').onclick = function () {
+    if (precisaLogin('roteiro.html')) return;
+
+    if (!localAtual) {
+        alert('Abra um estabelecimento antes');
         return;
     }
 
-    mostrarApp();
+    var ok = adicionarAoRoteiro(localAtual);
+    if (ok) {
+        colocarPins(listaMapaAtual.length ? listaMapaAtual : []);
+        if (listaMapaAtual.length) {
+            montarLista(listaMapaAtual);
+        }
+        atualizarBotaoRoteiro();
+        montarProximos(localAtual);
+        alert('Parada adicionada no mapa com numero e linha do caminho.');
+    } else {
+        alert('Esse local ja esta no roteiro');
+    }
 };
 
 document.getElementById('btn-sair').onclick = async function () {
     await fazerLogout();
-    document.getElementById('tela-app').hidden = true;
-    document.getElementById('tela-login').hidden = false;
-};
-
-document.getElementById('filtros').onclick = function (e) {
-    if (!e.target.classList.contains('filtro')) return;
-
-    filtroAtual = e.target.getAttribute('data-categoria');
-
-    var botoes = document.querySelectorAll('.filtro');
-    for (var i = 0; i < botoes.length; i++) {
-        botoes[i].classList.remove('ativo');
-    }
-    e.target.classList.add('ativo');
-
-    montarMapa();
-};
-
-document.getElementById('filtro-acessivel').onchange = function () {
-    montarMapa();
-};
-
-document.getElementById('btn-voltar-mapa').onclick = irProMapa;
-document.getElementById('btn-voltar-mapa-2').onclick = irProMapa;
-document.getElementById('btn-voltar-mapa-3').onclick = irProMapa;
-
-document.getElementById('btn-meus-cupons').onclick = function () {
-    mostrarCupons();
+    window.location.href = 'index.html';
 };
 
 document.getElementById('btn-validar-comercio').onclick = function () {
-    esconderTudo();
-    document.getElementById('painel-validacao').hidden = false;
-    document.getElementById('msg-validacao').hidden = true;
-    document.getElementById('resultado-validacao').hidden = true;
-    document.getElementById('campo-codigo').value = '';
+    if (precisaLogin('cupons.html')) return;
+    window.location.href = 'cupons.html';
 };
 
 document.getElementById('btn-gerar-cupom').onclick = async function () {
-    var cupom = await criarCupom(localAtual);
-    if (!cupom) return;
+    if (precisaLogin('index.html')) return;
 
-    var msg = document.getElementById('msg-ficha');
-    msg.hidden = false;
-    msg.className = 'msg-info ok';
-    msg.innerHTML = 'Cupom: <strong>' + cupom.codigo + '</strong><br>Mostre no comercio pra validar.';
-};
-
-document.getElementById('form-validacao').onsubmit = async function (e) {
-    e.preventDefault();
-
-    var codigo = document.getElementById('campo-codigo').value;
-    var resultado = await validarCupom(codigo);
-
-    if (!resultado) return;
-
-    var msg = document.getElementById('msg-validacao');
-    msg.hidden = false;
-    msg.className = 'msg-info ok';
-    msg.textContent = 'Cupom validado e salvo no banco/local.';
-
-    var caixa = document.getElementById('resultado-validacao');
-    caixa.hidden = false;
-    caixa.innerHTML =
-        '<div class="card-cupom status-usado">' +
-        '<p class="codigo">' + resultado.codigo + '</p>' +
-        '<p>' + resultado.beneficio + '</p>' +
-        '<p class="texto-pequeno">' + resultado.local_nome + '</p>' +
-        '</div>';
-};
-
-// start
-(async function () {
-    var u = await pegarUsuarioSalvo();
-    if (u) {
-        mostrarApp();
+    if (!localAtual || !localAtual.beneficio_id) {
+        alert('Esse local nao tem beneficio de parceiro.');
+        return;
     }
 
+    var parceiro = acharParceiro(localAtual) || localAtual;
+
+    var cupom = await criarCupom({
+        id: parceiro.id || localAtual.id,
+        nome: localAtual.nome,
+        beneficio_id: localAtual.beneficio_id || parceiro.beneficio_id,
+        beneficio: localAtual.beneficio || parceiro.beneficio
+    });
+
+    if (!cupom) return;
+
+    var msg = document.getElementById('msg-cupom');
+    msg.hidden = false;
+    msg.className = 'msg-info ok';
+    msg.innerHTML = 'Cupom: <strong>' + cupom.codigo + '</strong><br><a href="cupons.html">Ver meus cupons</a>';
+};
+
+(async function () {
+    await pegarUsuarioSalvo();
+    atualizarHeader();
+    await carregarParceiros();
+    await montarMapa();
+
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('./sw.js').then(function (reg) {
+            reg.update();
+        });
     }
 })();
