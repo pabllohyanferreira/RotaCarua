@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
+
+:root {
+    --creme: #F7F3E9;
+    --verde: #19302A;
+    --verde-claro: #DCE5D2;
+    --laranja: #F05A2A;
+    --amarelo: #F3CE4E;
+    --branco: #FFFFFF;
+    --cinza: #777D76;
+    --borda: #E9E4D9;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--creme);
+    color: var(--verde);
+    font-family: 'DM Sans', sans-serif;
+}
+
+header {
+    height: 76px;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--creme);
+    border-bottom: 1px solid var(--borda);
+}
+
+header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 25px;
+}
+
+header p {
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+header button {
+    background: white;
+    color: var(--verde);
+    border: 1px solid var(--borda);
+    border-radius: 30px;
+    padding: 11px 22px;
+    cursor: pointer;
+}
+
+main {
+    max-width: 1400px;
+    margin: auto;
+    padding: 35px 4%;
+}
+
+main > h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    margin-bottom: 25px;
+}
+
+#filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+#filters button {
+    background: white;
+    border: 1px solid;
+    color: var(--verde);
+    border-radius: 30px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
