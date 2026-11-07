@@ -298,3 +298,139 @@ input {
     color: var(--laranja);
     font-weight: 700;
 }
+
+.auth-container > p a:hover {
+    text-decoration: underline;
+}
+
+.auth-link {
+    margin-bottom: 0 !important;
+}
+
+.footer {
+    padding: 35px 7% 20px;
+    color: var(--branco);
+    background-color: var(--verde);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: flex-start;
+    padding-bottom: 25px;
+}
+
+.footer-brand {
+    max-width: 360px;
+}
+
+.footer h2 {
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.footer-brand span {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.footer p {
+    color: var(--verde-claro);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.footer-bottom {
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 700px) {
+
+    .header {
+        padding: 18px 5%;
+        flex-wrap: wrap;
+    }
+
+    .logo h1 {
+        font-size: 19px;
+    }
+
+    .navigation {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 20px;
+        padding-top: 12px;
+        border-top: 1px solid var(--cinza-claro);
+    }
+
+    .navigation a {
+        font-size: 12px;
+    }
+
+    .btn-login {
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+
+    .hero {
+        padding: 65px 7%;
+    }
+
+    .hero h2 {
+        font-size: 30px;
+    }
+
+    .hero p {
+        font-size: 14px;
+    }
+
+    .explore-section {
+        padding: 35px 5%;
+    }
+
+    .filters {
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .filter-button {
+        padding: 9px 14px;
+        font-size: 12px;
+    }
+
+    #map {
+        height: 320px;
+    }
+
+    #establishment-details {
+        padding: 20px;
+    }
+
+    .auth-section {
+        padding: 40px 15px;
+    }
+
+    .auth-container {
+        padding: 28px 22px;
+    }
+
+    .auth-container h2 {
+        font-size: 27px;
+    }
+
+    .footer {
+        padding: 30px 6% 18px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+}
