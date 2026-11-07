@@ -1,44 +1,160 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROTA CARUÁ</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-    <header>
-        <h1>ROTA CARUÁ</h1>
-        <p>DESCUBRA O CENTRO</p>
-        <button id="loginButton">Entrar</button>
+    <header class="header">
+
+        <a href="index.html" class="logo">
+            <h1>ROTA CARUÁ</h1>
+            <span>DESCUBRA CARUARU</span>
+        </a>
+
+        <nav class="navigation">
+            <a href="index.html" class="active">Explorar</a>
+            <a href="login.html">Meu roteiro</a>
+            <a href="login.html">Cupons</a>
+        </nav>
+
+        <a href="login.html" class="btn btn-login">Entrar</a>
+
     </header>
 
     <main>
-        <h2>O Centro está cheio de descobertas.</h2>
 
-        <nav id="filters">
-            <button>Todos</button>
-            <button>Comer</button>
-            <button>Artesanato</button>
-            <button>Moda</button>
-            <button>Serviços</button>
-            <button>Cultura</button>
-        </nav>
+        <section class="hero">
 
-        <section id="map">
-            <h3>Mapa de descobertas</h3>
-            <p>Os estabelecimentos aparecerão aqui.</p>
+            <span class="section-tag">DESCUBRA O CENTRO DE CARUARU</span>
+
+            <h2>
+                Diversas lojas e promoções
+                aguardando por você!
+            </h2>
+
+            <p>
+                Explore os melhores estabelecimentos e descubra
+                novas experiências pelo coração de Caruaru.
+            </p>
+
+            <a href="#explorar" class="btn btn-primary">
+                Começar a explorar
+            </a>
+
         </section>
 
-        <section id="establishment">
-            <h2></h2>
-            <p>Um ponto de encontro para cultura e inovação.</p>
-            <button>Gerar meu cupommmmmmmm</button>
-            <button>Abrir caminho até aqui</button>
+        <section id="explorar" class="explore-section">
+
+            <div class="filters">
+
+                <button type="button" class="filter-button active" data-category="todos">
+                    Todos
+                </button>
+
+                <button type="button" class="filter-button" data-category="gastronomia">
+                    Alimentação
+                </button>
+
+                <button type="button" class="filter-button" data-category="artesanato">
+                    Artesanato
+                </button>
+
+                <button type="button" class="filter-button" data-category="moda">
+                    Moda
+                </button>
+
+                <button type="button" class="filter-button" data-category="servicos">
+                    Serviços
+                </button>
+
+                <button type="button" class="filter-button" data-category="cultura">
+                    Cultura
+                </button>
+
+            </div>
+
+            <div id="map">
+                <p>O mapa de Caruaru será exibido aqui.</p>
+            </div>
+
+            <section class="establishments-section">
+
+                <h2>Estabelecimentos</h2>
+
+                <div id="establishments-list">
+                    <p>Os estabelecimentos cadastrados aparecerão aqui.</p>
+                </div>
+
+            </section>
+
+            <section id="establishment-details">
+
+                <h2 id="establishmentName">
+                    Detalhes do estabelecimento
+                </h2>
+
+                <p id="establishmentCategory"></p>
+
+                <p id="establishmentDescription">
+                    Selecione um estabelecimento para visualizar
+                    suas informações.
+                </p>
+
+                <p id="establishmentAddress"></p>
+
+                <p id="establishmentHours"></p>
+
+                <div class="benefit-area">
+
+                    <h3>Benefício disponível</h3>
+
+                    <p id="establishmentBenefit">
+                        Os benefícios serão exibidos aqui.
+                    </p>
+
+                    <a href="login.html" class="btn btn-primary">
+                        Resgatar benefício
+                    </a>
+
+                </div>
+
+                <a href="#" id="routeButton" class="btn btn-secondary">
+                    Como chegar
+                </a>
+
+            </section>
+
         </section>
+
     </main>
 
+    <footer class="footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+                <h2>ROTA CARUÁ</h2>
+                <p>
+                    Explore, descubra e valorize tudo que Caruaru tem a oferecer.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
+            <p>Feito para valorizar Caruaru.</p>
+        </div>
+
+    </footer>
+
     <script src="js/app.js"></script>
+
 </body>
 </html>
