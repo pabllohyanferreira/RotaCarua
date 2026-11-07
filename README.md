@@ -1,5 +1,7 @@
 # Rota Caruá
 
+#Jira : https://rotacarua.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog
+
 App feito para o Romathon: ajuda a pessoa a explorar o **Centro de Caruaru**, montar um passeio e aproveitar benefícios nos comércios parceiros.
 
 ## O que o app faz
