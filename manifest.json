@@ -1,0 +1,25 @@
+{
+  "name": "Rota Caruá",
+  "short_name": "Rota Caruá",
+  "description": "Descubra comércio, cultura e experiências no Centro de Caruaru.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F7F3E9",
+  "theme_color": "#19302A",
+  "lang": "pt-BR",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
