@@ -1,51 +1,37 @@
 # Rota Caruá
 
-App de descoberta do Centro de Caruaru (entorno da Estação Ferroviária e do Armazém / Pátio).
+App feito para o Romathon: ajuda a pessoa a explorar o **Centro de Caruaru**, montar um passeio e aproveitar benefícios nos comércios parceiros.
 
-## Telas do MVP (regulamento)
+## O que o app faz
 
-1. **Login** (`login.html`) — autenticação  
-2. **Explorar** (`index.html`) — mapa, filtros, lista e ficha  
-3. **Cupons** (`cupons.html`) — listar cupons + validar (comércio)  
-4. **Meu roteiro** (`roteiro.html`) — locais salvos + abrir no Maps
+- Mostra um **mapa** da área do Centro (Estação, ACIC e Pátio)
+- Permite **buscar e filtrar** lugares (alimentação, moda, cultura etc.)
+- Abre a **ficha** do local com informações e como chegar
+- Deixa montar um **roteiro** com a ordem das paradas
+- No mapa, as paradas aparecem **numeradas** e ligadas por uma linha
+- Mostra **onde você está** (se a localização do celular estiver ligada)
+- Gera e guarda **cupons** de benefícios
+- O comércio parceiro consegue **validar** o cupom do cliente
+- Dá para **instalar no celular** como um app (pela tela inicial do navegador)
 
-Layout mobile com menu inferior (Explorar / Roteiro / Cupons).
+## Telas principais
 
-Cadastro: `cadastro.html`
+1. **Explorar** — mapa e lista de lugares  
+2. **Meu roteiro** — locais salvos e ordem do passeio  
+3. **Cupons** — benefícios resgatados (e validação para o comércio)  
+4. **Login / Cadastro** — entrar ou criar conta  
 
-## Area do mapa
+## Para quem é
 
-Busca limitada ao polígono do Centro (Estação, ACIC, Pátio Luiz Gonzaga).  
-O Places usa círculo na API e depois filtra os pontos dentro do polígono (`js/area.js`).
+- **Visitante:** explorar, montar roteiro e resgatar cupom  
+- **Comércio:** validar o cupom apresentado pelo cliente  
 
-## Stack
+## Contas de demonstração
 
-- HTML / CSS / JS
-- Supabase (login, parceiros, cupons)
-- Google Maps + Places API (New) — chave em `js/config.js`
+- Visitante: `usuario@gmail.com` / `123456`  
+- Comércio: `adm@gmail.com` / `123456`  
 
-## Como rodar
+## Observação rápida
 
-1. Live Server  
-2. Demo:
-   - `usuario@gmail.com` / `123456` (visitante)
-   - `adm@gmail.com` / `123456` (comercio)
-
-## Piloto vs evolucao (doc de requisitos)
-
-| ID | Status |
-|----|--------|
-| RF01 Login/cadastro | OK |
-| RF02 Menu | Parcial (header) |
-| RF03 Mapa + filtros | OK |
-| RF04 Ficha | OK (foto depois) |
-| RF05 Rota | OK |
-| RF06 Resgate cupom | OK |
-| RF07 Validar cupom | OK |
-| RF08 Parceiros/beneficios | OK (seed) |
-| RF09 Relatorio | Evolucao |
-| RF10 Passaporte | Evolucao |
-
-## Arquivos principais
-
-`js/config.js` · `auth.js` · `area.js` · `places.js` · `mapa.js` · `estabelecimentos.js` · `cupons.js` · `app.js`
+O mapa e os lugares usam serviços online (Google e Supabase).  
+Para instalar no celular de forma completa, o site precisa estar publicado com endereço seguro (HTTPS).
