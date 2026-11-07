@@ -22,47 +22,55 @@
         </a>
 
         <nav class="navigation">
-            <a href="index.html">Explorar</a>
-            <a href="roteiro.html" class="active">Meu roteiro</a>
-            <a href="cupons.html" id="nav-cupons">Cupons</a>
+            <a href="index.html" data-i18n="nav_explorar">Explorar</a>
+            <a href="eventos.html" data-i18n="nav_eventos">Eventos</a>
+            <a href="roteiro.html" class="active" data-i18n="nav_roteiro">Meu roteiro</a>
+            <a href="cupons.html" id="nav-cupons" data-i18n="nav_cupons">Cupons</a>
         </nav>
 
         <div class="header-actions">
+            <div class="seletor-idioma" role="group" data-i18n-aria="idioma" aria-label="Idioma">
+                <button type="button" class="btn-lang" data-lang="pt" aria-pressed="true">PT</button>
+                <button type="button" class="btn-lang" data-lang="en" aria-pressed="false">EN</button>
+                <button type="button" class="btn-lang" data-lang="es" aria-pressed="false">ES</button>
+            </div>
             <span id="nome-usuario" class="user-name" hidden></span>
-            <button type="button" id="btn-sair" class="btn btn-login" hidden>Sair</button>
-            <a href="login.html" id="btn-entrar-header" class="btn btn-login">Entrar</a>
+            <button type="button" id="btn-sair" class="btn btn-login" hidden data-i18n="btn_sair">Sair</button>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login" data-i18n="btn_entrar">Entrar</a>
         </div>
     </header>
 
     <main class="pagina-cupons">
         <section class="auth-section pagina-interna">
             <div class="auth-container caixa-larga">
-                <span class="section-tag">SEU PASSEIO</span>
-                <h2>Meu roteiro</h2>
-                <p>Escolha a ordem no seletor de cada local. Essa ordem aparece numerada no mapa de Explorar.</p>
-                <p id="roteiro-vazio" hidden>Seu roteiro ainda esta vazio. Va em Explorar, abra um local e clique em Adicionar ao roteiro.</p>
+                <span class="section-tag" data-i18n="roteiro_tag">SEU PASSEIO</span>
+                <h2 data-i18n="roteiro_titulo">Meu roteiro</h2>
+                <p data-i18n="roteiro_intro">Escolha a ordem no seletor de cada local. Essa ordem aparece numerada no mapa de Explorar.</p>
+                <p id="roteiro-vazio" hidden data-i18n="roteiro_vazio">Seu roteiro ainda esta vazio. Va em Explorar, abra um local e clique em Adicionar ao roteiro.</p>
                 <div id="lista-roteiro" class="lista-roteiro-ordenavel"></div>
                 <div id="acoes-roteiro" class="acoes-roteiro" hidden>
-                    <a href="index.html#explorar" class="btn btn-primary">Ver no mapa</a>
+                    <a href="index.html#explorar" class="btn btn-primary" data-i18n="ver_mapa">Ver no mapa</a>
                 </div>
             </div>
         </section>
     </main>
 
     <nav class="nav-mobile" aria-label="Menu principal">
-        <a href="index.html" class="nav-mobile-item">Explorar</a>
-        <a href="roteiro.html" class="nav-mobile-item active">Roteiro</a>
-        <a href="cupons.html" class="nav-mobile-item">Cupons</a>
+        <a href="index.html" class="nav-mobile-item" data-i18n="nav_explorar">Explorar</a>
+        <a href="eventos.html" class="nav-mobile-item" data-i18n="nav_eventos">Eventos</a>
+        <a href="roteiro.html" class="nav-mobile-item active" data-i18n="nav_roteiro_curto">Roteiro</a>
+        <a href="cupons.html" class="nav-mobile-item" data-i18n="nav_cupons">Cupons</a>
     </nav>
 
     <footer class="footer footer-mobile-safe">
         <div class="footer-bottom">
-            <p>© 2026 ROTA CARUÁ</p>
+            <p data-i18n="footer_copy">© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/roteiro.js"></script>
     <script src="js/roteiro-pagina.js"></script>

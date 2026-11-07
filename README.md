@@ -10,6 +10,8 @@ App feito para o Romathon: ajuda a pessoa a explorar o **Centro de Caruaru**, mo
 - Deixa montar um **roteiro** com a ordem das paradas
 - No mapa, as paradas aparecem **numeradas** e ligadas por uma linha
 - Mostra **onde você está** (se a localização do celular estiver ligada)
+- Tem uma aba de **eventos fixos** da cidade (São João, Sucata, Dia das Crianças e Semana Santa)
+- Pode trocar o idioma para **português, inglês ou espanhol**
 - Gera e guarda **cupons** de benefícios
 - O comércio parceiro consegue **validar** o cupom do cliente
 - Dá para **instalar no celular** como um app (pela tela inicial do navegador)
@@ -17,13 +19,14 @@ App feito para o Romathon: ajuda a pessoa a explorar o **Centro de Caruaru**, mo
 ## Telas principais
 
 1. **Explorar** — mapa e lista de lugares  
-2. **Meu roteiro** — locais salvos e ordem do passeio  
-3. **Cupons** — benefícios resgatados (e validação para o comércio)  
-4. **Login / Cadastro** — entrar ou criar conta  
+2. **Eventos** — agenda fixa da cidade  
+3. **Meu roteiro** — locais salvos e ordem do passeio  
+4. **Cupons** — benefícios resgatados (e validação para o comércio)  
+5. **Login / Cadastro** — entrar ou criar conta  
 
 ## Para quem é
 
-- **Visitante:** explorar, montar roteiro e resgatar cupom  
+- **Visitante:** explorar, ver eventos, montar roteiro e resgatar cupom  
 - **Comércio:** validar o cupom apresentado pelo cliente  
 
 ## Contas de demonstração

@@ -25,64 +25,70 @@
         </a>
 
         <nav class="navigation">
-            <a href="index.html" class="active">Explorar</a>
-            <a href="roteiro.html" id="nav-roteiro">Meu roteiro</a>
-            <a href="cupons.html" id="nav-cupons">Cupons</a>
+            <a href="index.html" class="active" data-i18n="nav_explorar">Explorar</a>
+            <a href="eventos.html" data-i18n="nav_eventos">Eventos</a>
+            <a href="roteiro.html" id="nav-roteiro" data-i18n="nav_roteiro">Meu roteiro</a>
+            <a href="cupons.html" id="nav-cupons" data-i18n="nav_cupons">Cupons</a>
         </nav>
 
         <div class="header-actions">
+            <div class="seletor-idioma" role="group" data-i18n-aria="idioma" aria-label="Idioma">
+                <button type="button" class="btn-lang" data-lang="pt" aria-pressed="true">PT</button>
+                <button type="button" class="btn-lang" data-lang="en" aria-pressed="false">EN</button>
+                <button type="button" class="btn-lang" data-lang="es" aria-pressed="false">ES</button>
+            </div>
             <span id="nome-usuario" class="user-name" hidden></span>
-            <button type="button" id="btn-validar-comercio" class="btn btn-secondary" hidden>Validar cupom</button>
-            <button type="button" id="btn-sair" class="btn btn-login" hidden>Sair</button>
-            <a href="login.html" id="btn-entrar-header" class="btn btn-login">Entrar</a>
+            <button type="button" id="btn-validar-comercio" class="btn btn-secondary" hidden data-i18n="btn_validar">Validar cupom</button>
+            <button type="button" id="btn-sair" class="btn btn-login" hidden data-i18n="btn_sair">Sair</button>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login" data-i18n="btn_entrar">Entrar</a>
         </div>
     </header>
 
     <main>
 
         <section class="hero">
-            <span class="section-tag">DESCUBRA O CENTRO DE CARUARU</span>
-            <h2>Diversas lojas e promoções aguardando por você!</h2>
-            <p>
+            <span class="section-tag" data-i18n="hero_tag">DESCUBRA O CENTRO DE CARUARU</span>
+            <h2 data-i18n="hero_titulo">Diversas lojas e promoções aguardando por você!</h2>
+            <p data-i18n="hero_texto">
                 Explore os melhores estabelecimentos e descubra
                 novas experiências pelo coração de Caruaru.
             </p>
-            <a href="#explorar" class="btn btn-primary">Começar a explorar</a>
+            <a href="#explorar" class="btn btn-primary" data-i18n="hero_cta">Começar a explorar</a>
         </section>
 
         <section id="explorar" class="explore-section">
 
             <div class="filters">
-                <button type="button" class="filter-button active" data-categoria="todos">Todos</button>
-                <button type="button" class="filter-button" data-categoria="alimentacao">Alimentação</button>
-                <button type="button" class="filter-button" data-categoria="artesanato">Artesanato</button>
-                <button type="button" class="filter-button" data-categoria="moda">Moda</button>
-                <button type="button" class="filter-button" data-categoria="servicos">Serviços</button>
-                <button type="button" class="filter-button" data-categoria="cultura">Cultura</button>
+                <button type="button" class="filter-button active" data-categoria="todos" data-i18n="filtro_todos">Todos</button>
+                <button type="button" class="filter-button" data-categoria="alimentacao" data-i18n="filtro_alimentacao">Alimentação</button>
+                <button type="button" class="filter-button" data-categoria="artesanato" data-i18n="filtro_artesanato">Artesanato</button>
+                <button type="button" class="filter-button" data-categoria="moda" data-i18n="filtro_moda">Moda</button>
+                <button type="button" class="filter-button" data-categoria="servicos" data-i18n="filtro_servicos">Serviços</button>
+                <button type="button" class="filter-button" data-categoria="cultura" data-i18n="filtro_cultura">Cultura</button>
             </div>
 
             <div class="busca-box">
-                <input type="text" id="campo-busca" placeholder="Buscar lugar (ex: Faculdade Nova Roma Caruaru)">
-                <button type="button" id="btn-buscar" class="btn btn-primary">Buscar</button>
+                <input type="text" id="campo-busca" data-i18n-placeholder="busca_placeholder" placeholder="Buscar lugar (ex: Faculdade Nova Roma Caruaru)">
+                <button type="button" id="btn-buscar" class="btn btn-primary" data-i18n="busca_botao">Buscar</button>
             </div>
 
             <div id="map" class="area-mapa">
                 <div id="mapa-google"></div>
-                <p id="mapa-vazio">Carregando mapa...</p>
+                <p id="mapa-vazio" data-i18n="mapa_carregando">Carregando mapa...</p>
             </div>
-            <p id="status-localizacao" class="legenda-mapa texto-pequeno">Localizacao: aguardando...</p>
+            <p id="status-localizacao" class="legenda-mapa texto-pequeno" data-i18n="loc_aguardando">Localizacao: aguardando...</p>
 
             <section class="establishments-section">
-                <h2>Estabelecimentos</h2>
+                <h2 data-i18n="estabelecimentos">Estabelecimentos</h2>
                 <div id="establishments-list">
-                    <p>Os estabelecimentos aparecerão aqui.</p>
+                    <p data-i18n="estabelecimentos_vazio">Os estabelecimentos aparecerão aqui.</p>
                 </div>
             </section>
 
             <section id="establishment-details">
-                <h2 id="establishmentName">Detalhes do estabelecimento</h2>
+                <h2 id="establishmentName" data-i18n="ficha_titulo">Detalhes do estabelecimento</h2>
                 <p id="establishmentCategory"></p>
-                <p id="establishmentDescription">
+                <p id="establishmentDescription" data-i18n="ficha_dica">
                     Selecione um estabelecimento para visualizar suas informações.
                 </p>
                 <p id="establishmentAddress"></p>
@@ -92,26 +98,26 @@
                 <p id="establishmentSite"></p>
 
                 <div class="benefit-area" id="benefit-area" hidden>
-                    <h3>Benefício disponível</h3>
+                    <h3 data-i18n="beneficio_titulo">Benefício disponível</h3>
                     <p id="establishmentBenefit"></p>
                     <p id="establishmentBenefitRules" class="texto-pequeno"></p>
-                    <button type="button" id="btn-gerar-cupom" class="btn btn-primary">Resgatar benefício</button>
+                    <button type="button" id="btn-gerar-cupom" class="btn btn-primary" data-i18n="beneficio_botao">Resgatar benefício</button>
                     <p id="msg-cupom" class="msg-info" hidden></p>
                 </div>
 
                 <div class="ficha-acoes">
-                    <a href="#" id="routeButton" class="btn btn-secondary" target="_blank" rel="noopener">Como chegar</a>
-                    <button type="button" id="btn-add-roteiro" class="btn btn-primary">Adicionar ao roteiro</button>
+                    <a href="#" id="routeButton" class="btn btn-secondary" target="_blank" rel="noopener" data-i18n="como_chegar">Como chegar</a>
+                    <button type="button" id="btn-add-roteiro" class="btn btn-primary" data-i18n="add_roteiro">Adicionar ao roteiro</button>
                 </div>
 
                 <div id="bloco-proximos" class="bloco-proximos" hidden>
-                    <h3>Perto daqui</h3>
-                    <p class="texto-pequeno">Sugestoes por distancia pra continuar o passeio.</p>
+                    <h3 data-i18n="proximos_titulo">Perto daqui</h3>
+                    <p class="texto-pequeno" data-i18n="proximos_texto">Sugestoes por distancia pra continuar o passeio.</p>
                     <div id="lista-proximos"></div>
                 </div>
             </section>
 
-            <p class="legenda-mapa texto-pequeno">
+            <p class="legenda-mapa texto-pequeno" data-i18n="legenda_mapa">
                 No mapa: circulo = local · pin laranja numerado = parada do roteiro · linha = caminho sugerido · ponto azul = voce
             </p>
 
@@ -120,26 +126,28 @@
     </main>
 
     <nav class="nav-mobile" aria-label="Menu principal">
-        <a href="index.html" class="nav-mobile-item active">Explorar</a>
-        <a href="roteiro.html" id="nav-roteiro-mobile" class="nav-mobile-item">Roteiro</a>
-        <a href="cupons.html" id="nav-cupons-mobile" class="nav-mobile-item">Cupons</a>
+        <a href="index.html" class="nav-mobile-item active" data-i18n="nav_explorar">Explorar</a>
+        <a href="eventos.html" class="nav-mobile-item" data-i18n="nav_eventos">Eventos</a>
+        <a href="roteiro.html" id="nav-roteiro-mobile" class="nav-mobile-item" data-i18n="nav_roteiro_curto">Roteiro</a>
+        <a href="cupons.html" id="nav-cupons-mobile" class="nav-mobile-item" data-i18n="nav_cupons">Cupons</a>
     </nav>
 
     <footer class="footer footer-mobile-safe">
         <div class="footer-content">
             <div class="footer-brand">
                 <img src="img/logo-rota-carua.jpg" alt="Rota Caruá" class="logo-footer">
-                <p>Explore, descubra e valorize tudo que Caruaru tem a oferecer.</p>
+                <p data-i18n="footer_texto">Explore, descubra e valorize tudo que Caruaru tem a oferecer.</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
-            <p>Feito para valorizar Caruaru.</p>
+            <p data-i18n="footer_copy">© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
+            <p data-i18n="footer_feito">Feito para valorizar Caruaru.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/area.js"></script>
     <script src="js/estabelecimentos.js"></script>

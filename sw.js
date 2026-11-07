@@ -1,4 +1,4 @@
-var CACHE = 'rota-carua-v16';
+var CACHE = 'rota-carua-v17';
 
 self.addEventListener('install', function (e) {
     self.skipWaiting();
@@ -11,9 +11,11 @@ self.addEventListener('install', function (e) {
                 './cadastro.html',
                 './cupons.html',
                 './roteiro.html',
+                './eventos.html',
                 './manifest.json',
                 './css/style.css',
                 './js/config.js',
+                './js/i18n.js',
                 './js/auth.js',
                 './js/area.js',
                 './js/estabelecimentos.js',
@@ -21,6 +23,7 @@ self.addEventListener('install', function (e) {
                 './js/cupons-pagina.js',
                 './js/roteiro.js',
                 './js/roteiro-pagina.js',
+                './js/eventos-pagina.js',
                 './js/places.js',
                 './js/mapa.js',
                 './js/app.js',

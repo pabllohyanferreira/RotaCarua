@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#002048">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Rota Caruá">
+    <title>Eventos - ROTA CARUÁ</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icone-192.png">
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="img/logo-rota-carua.jpg" alt="Rota Caruá">
+        </a>
+
+        <nav class="navigation">
+            <a href="index.html" data-i18n="nav_explorar">Explorar</a>
+            <a href="eventos.html" class="active" data-i18n="nav_eventos">Eventos</a>
+            <a href="roteiro.html" data-i18n="nav_roteiro">Meu roteiro</a>
+            <a href="cupons.html" data-i18n="nav_cupons">Cupons</a>
+        </nav>
+
+        <div class="header-actions">
+            <div class="seletor-idioma" role="group" data-i18n-aria="idioma" aria-label="Idioma">
+                <button type="button" class="btn-lang" data-lang="pt" aria-pressed="true">PT</button>
+                <button type="button" class="btn-lang" data-lang="en" aria-pressed="false">EN</button>
+                <button type="button" class="btn-lang" data-lang="es" aria-pressed="false">ES</button>
+            </div>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login" data-i18n="btn_entrar">Entrar</a>
+        </div>
+    </header>
+
+    <main class="pagina-cupons">
+        <section class="auth-section pagina-interna">
+            <div class="auth-container caixa-larga">
+                <span class="section-tag" data-i18n="eventos_tag">AGENDA DA CIDADE</span>
+                <h2 data-i18n="eventos_titulo">Eventos fixos de Caruaru</h2>
+                <p data-i18n="eventos_intro">Datas tradicionais da cidade. Use o roteiro do Centro para aproveitar o comércio e a cultura na época de cada festa.</p>
+                <div id="lista-eventos" class="lista-eventos"></div>
+                <a href="index.html#explorar" class="btn btn-primary" style="margin-top: 16px;" data-i18n="ver_mapa">Ver no mapa</a>
+            </div>
+        </section>
+    </main>
+
+    <nav class="nav-mobile" aria-label="Menu principal">
+        <a href="index.html" class="nav-mobile-item" data-i18n="nav_explorar">Explorar</a>
+        <a href="eventos.html" class="nav-mobile-item active" data-i18n="nav_eventos">Eventos</a>
+        <a href="roteiro.html" class="nav-mobile-item" data-i18n="nav_roteiro_curto">Roteiro</a>
+        <a href="cupons.html" class="nav-mobile-item" data-i18n="nav_cupons">Cupons</a>
+    </nav>
+
+    <footer class="footer footer-mobile-safe">
+        <div class="footer-bottom">
+            <p data-i18n="footer_copy">© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/eventos-pagina.js"></script>
+</body>
+
+</html>

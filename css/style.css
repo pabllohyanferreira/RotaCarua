@@ -613,6 +613,60 @@ input {
     display: none;
 }
 
+.seletor-idioma {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    margin-right: 4px;
+}
+
+.btn-lang {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: 1px solid var(--cinza-claro);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--verde);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-lang.active {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: #fff;
+}
+
+.lista-eventos {
+    display: grid;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.card-evento {
+    padding: 16px;
+    border: 1px solid var(--cinza-claro);
+    border-radius: 12px;
+    background: #fff;
+    display: grid;
+    gap: 6px;
+}
+
+.card-evento h3 {
+    margin: 0;
+    color: var(--verde);
+    font-size: 18px;
+}
+
+.card-evento p {
+    margin: 0;
+    color: var(--cinza);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
 .caixa-larga {
     max-width: 640px;
 }
@@ -748,11 +802,21 @@ input {
     .nav-mobile-item {
         flex: 1;
         text-align: center;
-        padding: 10px 6px;
+        padding: 10px 4px;
         border-radius: 10px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         color: var(--verde);
+    }
+
+    .seletor-idioma {
+        margin-right: 0;
+    }
+
+    .btn-lang {
+        min-width: 32px;
+        min-height: 40px;
+        padding: 6px;
     }
 
     .nav-mobile-item.active {

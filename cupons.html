@@ -22,24 +22,30 @@
         </a>
 
         <nav class="navigation">
-            <a href="index.html">Explorar</a>
-            <a href="roteiro.html">Meu roteiro</a>
-            <a href="cupons.html" class="active">Cupons</a>
+            <a href="index.html" data-i18n="nav_explorar">Explorar</a>
+            <a href="eventos.html" data-i18n="nav_eventos">Eventos</a>
+            <a href="roteiro.html" data-i18n="nav_roteiro">Meu roteiro</a>
+            <a href="cupons.html" class="active" data-i18n="nav_cupons">Cupons</a>
         </nav>
 
         <div class="header-actions">
+            <div class="seletor-idioma" role="group" data-i18n-aria="idioma" aria-label="Idioma">
+                <button type="button" class="btn-lang" data-lang="pt" aria-pressed="true">PT</button>
+                <button type="button" class="btn-lang" data-lang="en" aria-pressed="false">EN</button>
+                <button type="button" class="btn-lang" data-lang="es" aria-pressed="false">ES</button>
+            </div>
             <span id="nome-usuario" class="user-name" hidden></span>
-            <button type="button" id="btn-sair" class="btn btn-login" hidden>Sair</button>
-            <a href="login.html" id="btn-entrar-header" class="btn btn-login">Entrar</a>
+            <button type="button" id="btn-sair" class="btn btn-login" hidden data-i18n="btn_sair">Sair</button>
+            <a href="login.html" id="btn-entrar-header" class="btn btn-login" data-i18n="btn_entrar">Entrar</a>
         </div>
     </header>
 
     <main class="pagina-cupons">
         <section class="auth-section pagina-interna">
             <div class="auth-container caixa-larga">
-                <span class="section-tag">SEUS BENEFICIOS</span>
-                <h2>Meus cupons</h2>
-                <p>Cupons gerados no app. Mostre o codigo no comercio parceiro.</p>
+                <span class="section-tag" data-i18n="cupons_tag">SEUS BENEFICIOS</span>
+                <h2 data-i18n="cupons_titulo">Meus cupons</h2>
+                <p data-i18n="cupons_intro">Cupons gerados no app. Mostre o codigo no comercio parceiro.</p>
                 <div id="lista-cupons">
                     <p>Carregando...</p>
                 </div>
@@ -48,16 +54,16 @@
 
         <section class="auth-section pagina-interna" id="bloco-validacao" hidden>
             <div class="auth-container caixa-larga">
-                <span class="section-tag">COMERCIO</span>
-                <h2>Validar cupom</h2>
-                <p>Digite o codigo que o cliente apresentar.</p>
+                <span class="section-tag" data-i18n="validar_tag">COMERCIO</span>
+                <h2 data-i18n="validar_titulo">Validar cupom</h2>
+                <p data-i18n="validar_intro">Digite o codigo que o cliente apresentar.</p>
 
                 <form id="form-validacao">
                     <div class="form-group">
-                        <label for="campo-codigo">Codigo do cupom</label>
+                        <label for="campo-codigo" data-i18n="validar_label">Codigo do cupom</label>
                         <input id="campo-codigo" type="text" required placeholder="Ex: RC-AB12CD" maxlength="20" style="text-transform: uppercase;">
                     </div>
-                    <button type="submit" class="btn btn-primary">Validar e registrar</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="validar_botao">Validar e registrar</button>
                 </form>
 
                 <p id="msg-validacao" class="msg-info" hidden></p>
@@ -67,19 +73,21 @@
     </main>
 
     <nav class="nav-mobile" aria-label="Menu principal">
-        <a href="index.html" class="nav-mobile-item">Explorar</a>
-        <a href="roteiro.html" class="nav-mobile-item">Roteiro</a>
-        <a href="cupons.html" class="nav-mobile-item active">Cupons</a>
+        <a href="index.html" class="nav-mobile-item" data-i18n="nav_explorar">Explorar</a>
+        <a href="eventos.html" class="nav-mobile-item" data-i18n="nav_eventos">Eventos</a>
+        <a href="roteiro.html" class="nav-mobile-item" data-i18n="nav_roteiro_curto">Roteiro</a>
+        <a href="cupons.html" class="nav-mobile-item active" data-i18n="nav_cupons">Cupons</a>
     </nav>
 
     <footer class="footer footer-mobile-safe">
         <div class="footer-bottom">
-            <p>© 2026 ROTA CARUÁ</p>
+            <p data-i18n="footer_copy">© 2026 ROTA CARUÁ. Todos os direitos reservados.</p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/cupons.js"></script>
     <script src="js/cupons-pagina.js"></script>
