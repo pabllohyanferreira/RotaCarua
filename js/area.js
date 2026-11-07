@@ -14,7 +14,24 @@ var CENTRO_AREA = {
     longitude: -35.9685
 };
 
-var RAIO_BUSCA_METROS = 700;
+var RAIO_BUSCA_METROS = 2000;
+
+function distanciaDoCentroMetros(lat, lng) {
+    var lat1 = CENTRO_AREA.latitude;
+    var lng1 = CENTRO_AREA.longitude;
+    var lat2 = Number(lat);
+    var lng2 = Number(lng);
+    if (isNaN(lat2) || isNaN(lng2)) return null;
+
+    var R = 6371000;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var x =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return Math.round(R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)));
+}
 
 function pontoDentroDaArea(lat, lng) {
     var dentro = false;
@@ -49,6 +66,22 @@ function filtrarDentroDaArea(lista) {
             continue;
         }
         if (pontoDentroDaArea(Number(item.lat), Number(item.lng))) {
+            saida.push(item);
+        }
+    }
+
+    return saida;
+}
+
+function filtrarPorRaio(lista, raio) {
+    var max = raio || RAIO_BUSCA_METROS;
+    var saida = [];
+
+    for (var i = 0; i < lista.length; i++) {
+        var item = lista[i];
+        if (item.lat == null || item.lng == null) continue;
+        var d = distanciaDoCentroMetros(item.lat, item.lng);
+        if (d != null && d <= max) {
             saida.push(item);
         }
     }

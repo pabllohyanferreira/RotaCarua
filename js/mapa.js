@@ -1,21 +1,44 @@
 var mapaGoogle = null;
+var mapaLeaflet = null;
 var marcadores = [];
+var camadaMarcadores = null;
 var poligonoArea = null;
 var linhaRoteiro = null;
 var mapaPronto = false;
+var motorMapa = null;
 var marcadorUsuario = null;
 var circuloUsuario = null;
 var watchUsuarioId = null;
 var posicaoUsuario = null;
 
 function chaveMapsOk() {
-    return GOOGLE_MAPS_KEY && GOOGLE_MAPS_KEY.indexOf('COLE_SUA') === -1;
+    return typeof GOOGLE_MAPS_KEY === 'string' && GOOGLE_MAPS_KEY.indexOf('COLE_SUA') === -1;
+}
+
+function carregarLeaflet() {
+    return new Promise(function (resolve, reject) {
+        if (window.L) {
+            resolve();
+            return;
+        }
+
+        var css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(css);
+
+        var script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = function () { resolve(); };
+        script.onerror = function () { reject(new Error('Nao carregou o Leaflet')); };
+        document.head.appendChild(script);
+    });
 }
 
 function carregarScriptMaps() {
     return new Promise(function (resolve, reject) {
         if (!chaveMapsOk()) {
-            reject(new Error('Falta a chave do Google Maps em js/config.js'));
+            reject(new Error('Sem chave Google'));
             return;
         }
 
@@ -24,7 +47,17 @@ function carregarScriptMaps() {
             return;
         }
 
+        var acabou = false;
+        var timer = setTimeout(function () {
+            if (acabou) return;
+            acabou = true;
+            reject(new Error('Google Maps demorou ou atingiu cota'));
+        }, 8000);
+
         window.__rotaCaruaMapsOk = function () {
+            if (acabou) return;
+            acabou = true;
+            clearTimeout(timer);
             resolve();
         };
 
@@ -36,16 +69,62 @@ function carregarScriptMaps() {
         script.async = true;
         script.defer = true;
         script.onerror = function () {
+            if (acabou) return;
+            acabou = true;
+            clearTimeout(timer);
             reject(new Error('Nao carregou a API do Google Maps'));
         };
         document.head.appendChild(script);
     });
 }
 
-function desenharAreaNoMapa() {
-    if (poligonoArea) {
-        return;
+function iniciarMapaLeaflet() {
+    var caixa = document.getElementById('mapa-google');
+    if (!caixa) throw new Error('Div do mapa nao encontrada');
+
+    caixa.innerHTML = '';
+    mapaLeaflet = L.map(caixa, { zoomControl: true }).setView(
+        [CENTRO_AREA.latitude, CENTRO_AREA.longitude],
+        16
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(mapaLeaflet);
+
+    camadaMarcadores = L.layerGroup().addTo(mapaLeaflet);
+
+    var pontos = [];
+    for (var i = 0; i < VERTICES_AREA.length; i++) {
+        pontos.push([VERTICES_AREA[i].lat, VERTICES_AREA[i].lng]);
     }
+
+    poligonoArea = L.polygon(pontos, {
+        color: '#002048',
+        weight: 2,
+        fillColor: '#F8A008',
+        fillOpacity: 0.18,
+        interactive: false
+    }).addTo(mapaLeaflet);
+
+    motorMapa = 'leaflet';
+    mapaPronto = true;
+    setTimeout(iniciarLocalizacaoUsuario, 300);
+    setTimeout(function () { mapaLeaflet.invalidateSize(); }, 200);
+}
+
+function iniciarMapaGoogle() {
+    var caixa = document.getElementById('mapa-google');
+    if (!caixa) throw new Error('Div do mapa nao encontrada');
+
+    mapaGoogle = new google.maps.Map(caixa, {
+        center: { lat: CENTRO_AREA.latitude, lng: CENTRO_AREA.longitude },
+        zoom: 16,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+    });
 
     poligonoArea = new google.maps.Polygon({
         paths: VERTICES_AREA,
@@ -57,28 +136,22 @@ function desenharAreaNoMapa() {
         map: mapaGoogle,
         clickable: false
     });
-}
 
-function iniciarMapaGoogle() {
-    var caixa = document.getElementById('mapa-google');
-    if (!caixa) {
-        throw new Error('Div do mapa nao encontrada');
-    }
-
-    mapaGoogle = new google.maps.Map(caixa, {
-        center: { lat: CENTRO_AREA.latitude, lng: CENTRO_AREA.longitude },
-        zoom: 16,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
-    });
-
-    desenharAreaNoMapa();
+    motorMapa = 'google';
     mapaPronto = true;
     setTimeout(iniciarLocalizacaoUsuario, 400);
 }
 
 function limparMarcadores() {
+    if (motorMapa === 'leaflet') {
+        if (camadaMarcadores) camadaMarcadores.clearLayers();
+        if (linhaRoteiro) {
+            mapaLeaflet.removeLayer(linhaRoteiro);
+            linhaRoteiro = null;
+        }
+        return;
+    }
+
     for (var i = 0; i < marcadores.length; i++) {
         marcadores[i].setMap(null);
     }
@@ -95,274 +168,349 @@ function corDoPin(categoria) {
     if (categoria === 'artesanato') return '#C47A2C';
     if (categoria === 'moda') return '#3D5A80';
     if (categoria === 'servicos') return '#5A6570';
-    if (categoria === 'cultura') return '#002048';
     return '#002048';
 }
 
-function mapaParadasRoteiro() {
-    var mapa = {};
-    var ordenadas = lerRoteiro();
-    for (var i = 0; i < ordenadas.length; i++) {
-        mapa[ordenadas[i].chave] = {
-            numero: i + 1,
-            item: ordenadas[i]
-        };
-    }
-    return mapa;
-}
-
-function desenharLinhaRoteiro(paradas) {
-    if (linhaRoteiro) {
-        linhaRoteiro.setMap(null);
-        linhaRoteiro = null;
-    }
-
-    if (!paradas || paradas.length < 2) {
-        return;
-    }
-
-    var path = [];
-    for (var i = 0; i < paradas.length; i++) {
-        var lat = Number(paradas[i].lat);
-        var lng = Number(paradas[i].lng);
-        if (isNaN(lat) || isNaN(lng)) continue;
-        path.push({ lat: lat, lng: lng });
-    }
-
-    if (path.length < 2) {
-        return;
-    }
-
-    linhaRoteiro = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: '#F8A008',
-        strokeOpacity: 0.95,
-        strokeWeight: 4,
-        map: mapaGoogle,
-        zIndex: 50
+function iconeLeafletComum(cor) {
+    return L.divIcon({
+        className: 'pin-leaflet',
+        html: '<span class="pin-bola" style="background:' + cor + '"></span>',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
     });
 }
 
-function iconeParadaNumerada() {
-    return {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 14,
-        fillColor: '#F8A008',
-        fillOpacity: 1,
-        strokeColor: '#002048',
-        strokeWeight: 3
-    };
+function iconeLeafletParada(numero) {
+    return L.divIcon({
+        className: 'pin-leaflet pin-leaflet-parada',
+        html: '<span class="pin-parada">' + numero + '</span>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -12]
+    });
 }
 
-function iconeLocalComum(item) {
-    return {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: corDoPin(item.categoria),
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2
-    };
+function numeroParadaDoLocal(local, roteiro) {
+    if (!local || !roteiro || !roteiro.length) return null;
+
+    var chave = chaveDoLocal(local);
+    var i;
+
+    for (i = 0; i < roteiro.length; i++) {
+        if (chave && roteiro[i].chave === chave) {
+            return i + 1;
+        }
+    }
+
+    var lat = Number(local.lat);
+    var lng = Number(local.lng);
+    if (isNaN(lat) || isNaN(lng)) return null;
+
+    for (i = 0; i < roteiro.length; i++) {
+        var sla = Number(roteiro[i].lat);
+        var sln = Number(roteiro[i].lng);
+        if (isNaN(sla) || isNaN(sln)) continue;
+        if (Math.abs(sla - lat) < 0.00025 && Math.abs(sln - lng) < 0.00025) {
+            return i + 1;
+        }
+    }
+
+    return null;
 }
 
 function atualizarMarcadorUsuario(lat, lng, precisao) {
-    if (!mapaGoogle) return;
+    posicaoUsuario = { lat: lat, lng: lng };
 
-    var pos = { lat: lat, lng: lng };
-    posicaoUsuario = pos;
+    if (motorMapa === 'leaflet' && mapaLeaflet) {
+        if (!marcadorUsuario) {
+            marcadorUsuario = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'pin-leaflet',
+                    html: '<span class="pin-eu"></span>',
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                }),
+                zIndexOffset: 2000,
+                title: 'Voce esta aqui'
+            }).addTo(mapaLeaflet);
+        } else {
+            marcadorUsuario.setLatLng([lat, lng]);
+        }
 
-    if (!marcadorUsuario) {
-        marcadorUsuario = new google.maps.Marker({
-            position: pos,
-            map: mapaGoogle,
-            title: 'Voce esta aqui',
-            zIndex: 2000,
-            icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 9,
+        if (!circuloUsuario) {
+            circuloUsuario = L.circle([lat, lng], {
+                radius: precisao || 40,
+                color: '#1A73E8',
+                weight: 1,
                 fillColor: '#1A73E8',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 3
-            }
-        });
-    } else {
-        marcadorUsuario.setPosition(pos);
-    }
+                fillOpacity: 0.15,
+                interactive: false
+            }).addTo(mapaLeaflet);
+        } else {
+            circuloUsuario.setLatLng([lat, lng]);
+            circuloUsuario.setRadius(precisao || 40);
+        }
+    } else if (motorMapa === 'google' && mapaGoogle) {
+        var pos = { lat: lat, lng: lng };
+        if (!marcadorUsuario) {
+            marcadorUsuario = new google.maps.Marker({
+                position: pos,
+                map: mapaGoogle,
+                title: 'Voce esta aqui',
+                zIndex: 2000,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 9,
+                    fillColor: '#1A73E8',
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 3
+                }
+            });
+        } else {
+            marcadorUsuario.setPosition(pos);
+        }
 
-    if (!circuloUsuario) {
-        circuloUsuario = new google.maps.Circle({
-            map: mapaGoogle,
-            center: pos,
-            radius: precisao || 40,
-            fillColor: '#1A73E8',
-            fillOpacity: 0.15,
-            strokeColor: '#1A73E8',
-            strokeOpacity: 0.4,
-            strokeWeight: 1,
-            clickable: false,
-            zIndex: 10
-        });
-    } else {
-        circuloUsuario.setCenter(pos);
-        circuloUsuario.setRadius(precisao || 40);
+        if (!circuloUsuario) {
+            circuloUsuario = new google.maps.Circle({
+                map: mapaGoogle,
+                center: pos,
+                radius: precisao || 40,
+                fillColor: '#1A73E8',
+                fillOpacity: 0.15,
+                strokeColor: '#1A73E8',
+                strokeOpacity: 0.4,
+                strokeWeight: 1,
+                clickable: false
+            });
+        } else {
+            circuloUsuario.setCenter(pos);
+            circuloUsuario.setRadius(precisao || 40);
+        }
     }
 
     var status = document.getElementById('status-localizacao');
-    if (status) {
-        status.textContent = 'Localizacao ativa no mapa';
-    }
+    if (status) status.textContent = 'Localizacao ativa no mapa';
 }
 
 function iniciarLocalizacaoUsuario() {
-    if (!navigator.geolocation) {
-        var status = document.getElementById('status-localizacao');
-        if (status) {
-            status.textContent = 'Seu aparelho nao tem geolocalizacao';
-        }
-        return;
-    }
-
-    if (watchUsuarioId != null) {
-        return;
-    }
-
     var status = document.getElementById('status-localizacao');
-    if (status) {
-        status.textContent = 'Pedindo sua localizacao...';
+    if (!navigator.geolocation) {
+        if (status) status.textContent = 'Sem geolocalizacao nesse aparelho';
+        return;
     }
+    if (watchUsuarioId != null) return;
+    if (status) status.textContent = 'Pedindo sua localizacao...';
 
     watchUsuarioId = navigator.geolocation.watchPosition(
         function (pos) {
-            atualizarMarcadorUsuario(
-                pos.coords.latitude,
-                pos.coords.longitude,
-                pos.coords.accuracy
-            );
+            atualizarMarcadorUsuario(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
         },
         function () {
-            if (status) {
-                status.textContent = 'Ative a localizacao do celular pra aparecer no mapa';
-            }
+            if (status) status.textContent = 'Ative a localizacao do celular pra aparecer no mapa';
         },
-        {
-            enableHighAccuracy: true,
-            maximumAge: 5000,
-            timeout: 15000
-        }
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     );
 }
 
 function colocarPins(lista) {
     limparMarcadores();
-    if (!mapaGoogle) return;
+    if (!mapaPronto) return;
 
-    var paradasMap = mapaParadasRoteiro();
-    var paradasOrdenadas = lerRoteiro();
+    var roteiro = [];
+    try { roteiro = lerRoteiro(); } catch (e) { roteiro = []; }
 
-    desenharLinhaRoteiro(paradasOrdenadas);
+    var path = [];
+    for (var t = 0; t < roteiro.length; t++) {
+        var la = Number(roteiro[t].lat);
+        var ln = Number(roteiro[t].lng);
+        if (!isNaN(la) && !isNaN(ln)) {
+            path.push(motorMapa === 'leaflet' ? [la, ln] : { lat: la, lng: ln });
+        }
+    }
 
-    var bounds = new google.maps.LatLngBounds();
+    if (path.length >= 2) {
+        if (motorMapa === 'leaflet') {
+            linhaRoteiro = L.polyline(path, {
+                color: '#F8A008',
+                weight: 5,
+                opacity: 0.95,
+                dashArray: null
+            }).addTo(mapaLeaflet);
+            linhaRoteiro.bringToBack();
+        } else {
+            linhaRoteiro = new google.maps.Polyline({
+                path: path,
+                geodesic: true,
+                strokeColor: '#F8A008',
+                strokeOpacity: 0.95,
+                strokeWeight: 5,
+                map: mapaGoogle,
+                zIndex: 50
+            });
+        }
+    }
+
+    var boundsLeaflet = [];
+    var boundsGoogle = motorMapa === 'google' ? new google.maps.LatLngBounds() : null;
+    var jaMarcou = {};
     var temPonto = false;
-    var chavesJaMarcadas = {};
+    var temRoteiro = path.length > 0;
+
+    function addBounds(lat, lng) {
+        if (motorMapa === 'leaflet') boundsLeaflet.push([lat, lng]);
+        else boundsGoogle.extend({ lat: lat, lng: lng });
+        temPonto = true;
+    }
+
+    function marcarParada(lat, lng, num, titulo, local) {
+        if (motorMapa === 'leaflet') {
+            var marker = L.marker([lat, lng], {
+                icon: iconeLeafletParada(num),
+                title: 'Parada ' + num + ': ' + titulo,
+                zIndexOffset: 1000 + num,
+                riseOnHover: true
+            });
+            if (local && typeof abrirFicha === 'function') {
+                marker.on('click', (function (l) {
+                    return function () { abrirFicha(l); };
+                })(local));
+            }
+            camadaMarcadores.addLayer(marker);
+        } else {
+            var gMarker = new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: mapaGoogle,
+                title: 'Parada ' + num + ': ' + titulo,
+                zIndex: 1000 + num,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 14,
+                    fillColor: '#F8A008',
+                    fillOpacity: 1,
+                    strokeColor: '#002048',
+                    strokeWeight: 3
+                },
+                label: {
+                    text: String(num),
+                    color: '#002048',
+                    fontWeight: '700',
+                    fontSize: '13px'
+                }
+            });
+            if (local && typeof abrirFicha === 'function') {
+                gMarker.addListener('click', (function (l) {
+                    return function () { abrirFicha(l); };
+                })(local));
+            }
+            marcadores.push(gMarker);
+        }
+        addBounds(lat, lng);
+    }
 
     for (var i = 0; i < lista.length; i++) {
         var item = lista[i];
-        var pos = {
-            lat: Number(item.lat),
-            lng: Number(item.lng)
-        };
+        var lat = Number(item.lat);
+        var lng = Number(item.lng);
+        if (isNaN(lat) || isNaN(lng)) continue;
 
-        if (isNaN(pos.lat) || isNaN(pos.lng)) {
+        var chave = chaveDoLocal(item);
+        var num = numeroParadaDoLocal(item, roteiro);
+
+        if (num) {
+            marcarParada(lat, lng, num, item.nome, item);
+            if (chave) jaMarcou[chave] = true;
+            jaMarcou['n' + num] = true;
             continue;
         }
 
-        var chave = chaveDoLocal(item);
-        var parada = chave ? paradasMap[chave] : null;
-        var opcoes = {
-            position: pos,
-            map: mapaGoogle,
-            title: parada ? ('Parada ' + parada.numero + ': ' + item.nome) : item.nome,
-            zIndex: parada ? 900 + parada.numero : 1
-        };
-
-        if (parada) {
-            chavesJaMarcadas[chave] = true;
-            opcoes.icon = iconeParadaNumerada();
-            opcoes.label = {
-                text: String(parada.numero),
-                color: '#002048',
-                fontWeight: '700',
-                fontSize: '12px'
-            };
+        if (motorMapa === 'leaflet') {
+            var markerComum = L.marker([lat, lng], {
+                icon: iconeLeafletComum(corDoPin(item.categoria)),
+                title: item.nome,
+                zIndexOffset: 1
+            });
+            markerComum.on('click', (function (local) {
+                return function () { abrirFicha(local); };
+            })(item));
+            camadaMarcadores.addLayer(markerComum);
         } else {
-            opcoes.icon = iconeLocalComum(item);
+            var gComum = new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: mapaGoogle,
+                title: item.nome,
+                zIndex: 1,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: corDoPin(item.categoria),
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 2
+                }
+            });
+            gComum.addListener('click', (function (local) {
+                return function () { abrirFicha(local); };
+            })(item));
+            marcadores.push(gComum);
         }
 
-        var marker = new google.maps.Marker(opcoes);
-
-        marker.addListener('click', (function (local) {
-            return function () {
-                abrirFicha(local);
-            };
-        })(item));
-
-        marcadores.push(marker);
-        bounds.extend(pos);
-        temPonto = true;
+        if (!temRoteiro) addBounds(lat, lng);
     }
 
-    for (var p = 0; p < paradasOrdenadas.length; p++) {
-        var stop = paradasOrdenadas[p];
-        if (chavesJaMarcadas[stop.chave]) continue;
+    for (var p = 0; p < roteiro.length; p++) {
+        var stop = roteiro[p];
+        var numStop = p + 1;
+        if (jaMarcou[stop.chave] || jaMarcou['n' + numStop]) continue;
 
-        var posStop = {
-            lat: Number(stop.lat),
-            lng: Number(stop.lng)
-        };
-        if (isNaN(posStop.lat) || isNaN(posStop.lng)) continue;
+        var sla = Number(stop.lat);
+        var sln = Number(stop.lng);
+        if (isNaN(sla) || isNaN(sln)) continue;
 
-        var markerStop = new google.maps.Marker({
-            position: posStop,
-            map: mapaGoogle,
-            title: 'Parada ' + (p + 1) + ': ' + stop.nome,
-            zIndex: 900 + (p + 1),
-            icon: iconeParadaNumerada(),
-            label: {
-                text: String(p + 1),
-                color: '#002048',
-                fontWeight: '700',
-                fontSize: '12px'
-            }
-        });
-
-        marcadores.push(markerStop);
-        bounds.extend(posStop);
-        temPonto = true;
+        marcarParada(sla, sln, numStop, stop.nome, null);
+        if (stop.chave) jaMarcou[stop.chave] = true;
     }
 
-    if (posicaoUsuario) {
-        bounds.extend(posicaoUsuario);
-        temPonto = true;
+    if (posicaoUsuario) addBounds(posicaoUsuario.lat, posicaoUsuario.lng);
+
+    if (!temRoteiro) {
+        for (var v = 0; v < VERTICES_AREA.length; v++) {
+            addBounds(VERTICES_AREA[v].lat, VERTICES_AREA[v].lng);
+        }
     }
 
-    for (var v = 0; v < VERTICES_AREA.length; v++) {
-        bounds.extend(VERTICES_AREA[v]);
-        temPonto = true;
-    }
+    if (!temPonto) return;
 
-    if (temPonto && !bounds.isEmpty()) {
-        mapaGoogle.fitBounds(bounds);
+    if (motorMapa === 'leaflet') {
+        if (boundsLeaflet.length === 1) {
+            mapaLeaflet.setView(boundsLeaflet[0], 16);
+        } else {
+            mapaLeaflet.fitBounds(boundsLeaflet, { padding: [36, 36], maxZoom: 17 });
+        }
+    } else if (!boundsGoogle.isEmpty()) {
+        mapaGoogle.fitBounds(boundsGoogle, 40);
     }
 }
 
 async function prepararMapa() {
     if (mapaPronto) {
+        if (motorMapa === 'leaflet' && mapaLeaflet) mapaLeaflet.invalidateSize();
         return true;
     }
 
-    await carregarScriptMaps();
-    iniciarMapaGoogle();
+    var preferirLivre = typeof USAR_MAPA_LIVRE === 'undefined' ? true : USAR_MAPA_LIVRE;
+
+    if (!preferirLivre) {
+        try {
+            await carregarScriptMaps();
+            iniciarMapaGoogle();
+            return true;
+        } catch (e) {
+            console.log('Google Maps falhou, usando mapa livre', e);
+        }
+    }
+
+    await carregarLeaflet();
+    iniciarMapaLeaflet();
     return true;
 }

@@ -9,6 +9,33 @@ function montarOpcoesPosicao(total, atual) {
     return html;
 }
 
+async function atualizarMapaRoteiro() {
+    var caixa = document.getElementById('map');
+    var legenda = document.getElementById('legenda-roteiro-mapa');
+    var lista = lerRoteiro();
+
+    if (!lista.length) {
+        if (caixa) caixa.hidden = true;
+        if (legenda) legenda.hidden = true;
+        return;
+    }
+
+    if (caixa) caixa.hidden = false;
+    if (legenda) legenda.hidden = false;
+
+    try {
+        await prepararMapa();
+        colocarPins([]);
+        if (mapaLeaflet) {
+            setTimeout(function () {
+                mapaLeaflet.invalidateSize();
+            }, 150);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 function montarListaRoteiro() {
     var caixa = document.getElementById('lista-roteiro');
     var lista = lerRoteiro();
@@ -19,6 +46,7 @@ function montarListaRoteiro() {
         caixa.innerHTML = '';
         if (vazio) vazio.hidden = false;
         if (acoes) acoes.hidden = true;
+        atualizarMapaRoteiro();
         return;
     }
 
@@ -74,6 +102,8 @@ function montarListaRoteiro() {
 
         caixa.appendChild(div);
     }
+
+    atualizarMapaRoteiro();
 }
 
 async function carregarPaginaRoteiro() {

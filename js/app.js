@@ -39,7 +39,10 @@ function precisaLogin(destino) {
 async function carregarParceiros() {
     try {
         var todos = await buscarLocais('todos', false);
-        parceirosDb = filtrarDentroDaArea(todos);
+        parceirosDb = filtrarPorRaio(todos, RAIO_BUSCA_METROS + 500);
+        if (!parceirosDb.length) {
+            parceirosDb = todos;
+        }
     } catch (e) {
         parceirosDb = [];
     }
@@ -130,14 +133,22 @@ function montarLista(lista) {
         return;
     }
 
+    var roteiro = [];
+    try { roteiro = lerRoteiro(); } catch (e) { roteiro = []; }
+
     for (var i = 0; i < lista.length; i++) {
         var item = lista[i];
+        var numParada = typeof numeroParadaDoLocal === 'function'
+            ? numeroParadaDoLocal(item, roteiro)
+            : null;
         var card = document.createElement('button');
         card.type = 'button';
-        card.className = 'card-local' + (estaNoRoteiro(item) ? ' no-roteiro' : '');
+        card.className = 'card-local' + (numParada ? ' no-roteiro' : '');
         card.innerHTML =
             '<strong>' + item.nome + '</strong>' +
-            (estaNoRoteiro(item) ? '<span class="badge badge-roteiro">No roteiro</span>' : '') +
+            (numParada
+                ? '<span class="badge badge-roteiro">Parada ' + numParada + '</span>'
+                : '') +
             (item.parceiro ? '<span class="badge">Parceiro</span>' : '') +
             '<span>' + (item.endereco || '') + '</span>' +
             (item.rating ? '<span>Nota: ' + item.rating + '</span>' : '');
@@ -152,8 +163,63 @@ function montarLista(lista) {
     }
 }
 
+function listaBaseMapa() {
+    var lista = [];
+    var i;
+
+    for (i = 0; i < parceirosDb.length; i++) {
+        var p = parceirosDb[i];
+        if (filtroAtual === 'todos' || p.categoria === filtroAtual) {
+            p.origem = 'supabase';
+            p.parceiro = true;
+            lista.push(p);
+        }
+    }
+
+    if (typeof locaisDestaquePorCategoria === 'function') {
+        var destaques = locaisDestaquePorCategoria(filtroAtual);
+        for (i = 0; i < destaques.length; i++) {
+            lista.push(destaques[i]);
+        }
+    }
+
+    return lista;
+}
+
+function juntarLocaisNoMapa(listaPlaces) {
+    var listaFinal = listaBaseMapa();
+    var chaves = {};
+    var i;
+
+    for (i = 0; i < listaFinal.length; i++) {
+        chaves[chaveDoLocal(listaFinal[i])] = true;
+    }
+
+    for (i = 0; i < listaPlaces.length; i++) {
+        var place = listaPlaces[i];
+        var chave = chaveDoLocal(place);
+        if (chaves[chave]) continue;
+
+        var parceiro = acharParceiro(place);
+        if (parceiro) {
+            place.parceiro = true;
+            place.beneficio_id = parceiro.beneficio_id;
+            place.beneficio = parceiro.beneficio;
+            place.regras = parceiro.regras;
+            place.id = parceiro.id;
+        }
+
+        chaves[chave] = true;
+        listaFinal.push(place);
+    }
+
+    return listaFinal;
+}
+
 async function montarMapa() {
     var vazio = document.getElementById('mapa-vazio');
+    var pedidoFiltro = filtroAtual;
+
     vazio.hidden = false;
     vazio.textContent = 'Carregando mapa...';
 
@@ -164,53 +230,43 @@ async function montarMapa() {
         return;
     }
 
-    var listaPlaces = [];
-    try {
-        listaPlaces = await buscarProximos(filtroAtual);
-    } catch (erro) {
-        console.log(erro);
-        listaPlaces = [];
-    }
-
-    var listaFinal = [];
-
-    for (var i = 0; i < parceirosDb.length; i++) {
-        var p = parceirosDb[i];
-        if (filtroAtual === 'todos' || p.categoria === filtroAtual) {
-            p.origem = 'supabase';
-            p.parceiro = true;
-            listaFinal.push(p);
-        }
-    }
-
-    for (var j = 0; j < listaPlaces.length; j++) {
-        var place = listaPlaces[j];
-        var parceiro = acharParceiro(place);
-
-        if (parceiro) {
-            place.parceiro = true;
-            place.beneficio_id = parceiro.beneficio_id;
-            place.beneficio = parceiro.beneficio;
-            place.regras = parceiro.regras;
-            place.id = parceiro.id;
-        }
-
-        listaFinal.push(place);
-    }
-
-    if (!listaFinal.length) {
-        listaMapaAtual = [];
-        vazio.hidden = false;
-        vazio.textContent = 'Nenhum local nessa categoria dentro da area.';
+    var base = listaBaseMapa();
+    listaMapaAtual = base;
+    if (base.length) {
+        vazio.hidden = true;
+        colocarPins(base);
+        montarLista(base);
+    } else {
+        vazio.textContent = 'Buscando locais perto...';
         colocarPins([]);
         montarLista([]);
-        return;
     }
 
-    listaMapaAtual = listaFinal;
-    vazio.hidden = true;
-    colocarPins(listaFinal);
-    montarLista(listaFinal);
+    buscarProximos(pedidoFiltro).then(function (listaPlaces) {
+        if (pedidoFiltro !== filtroAtual) return;
+
+        var listaFinal = juntarLocaisNoMapa(listaPlaces || []);
+        if (!listaFinal.length) {
+            listaMapaAtual = [];
+            vazio.hidden = false;
+            vazio.textContent = 'Nenhum local nessa categoria dentro da area.';
+            colocarPins([]);
+            montarLista([]);
+            return;
+        }
+
+        listaMapaAtual = listaFinal;
+        vazio.hidden = true;
+        colocarPins(listaFinal);
+        montarLista(listaFinal);
+    }).catch(function (erro) {
+        console.log(erro);
+        if (pedidoFiltro !== filtroAtual) return;
+        if (!listaMapaAtual.length) {
+            vazio.hidden = false;
+            vazio.textContent = 'Nenhum local nessa categoria dentro da area.';
+        }
+    });
 }
 
 async function abrirFicha(local) {
@@ -395,9 +451,19 @@ document.getElementById('btn-gerar-cupom').onclick = async function () {
 };
 
 (async function () {
+    var mapaPromise = prepararMapa().catch(function (e) {
+        console.log(e);
+        return null;
+    });
+
     await pegarUsuarioSalvo();
     atualizarHeader();
-    await carregarParceiros();
+
+    await Promise.all([
+        carregarParceiros(),
+        mapaPromise
+    ]);
+
     await montarMapa();
 
     if ('serviceWorker' in navigator) {

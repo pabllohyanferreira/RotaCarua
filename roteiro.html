@@ -10,8 +10,10 @@
     <meta name="apple-mobile-web-app-title" content="Rota Caruá">
     <title>Meu roteiro - ROTA CARUÁ</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icone-192.png">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 </head>
 
 <body>
@@ -45,11 +47,17 @@
             <div class="auth-container caixa-larga">
                 <span class="section-tag" data-i18n="roteiro_tag">SEU PASSEIO</span>
                 <h2 data-i18n="roteiro_titulo">Meu roteiro</h2>
-                <p data-i18n="roteiro_intro">Escolha a ordem no seletor de cada local. Essa ordem aparece numerada no mapa de Explorar.</p>
+                <p data-i18n="roteiro_intro">Escolha a ordem no seletor de cada local. Essa ordem aparece numerada no mapa.</p>
                 <p id="roteiro-vazio" hidden data-i18n="roteiro_vazio">Seu roteiro ainda esta vazio. Va em Explorar, abra um local e clique em Adicionar ao roteiro.</p>
+                <div id="map" class="area-mapa mapa-roteiro" hidden>
+                    <div id="mapa-google"></div>
+                </div>
+                <p id="legenda-roteiro-mapa" class="legenda-mapa texto-pequeno" hidden>
+                    Pin laranja com numero = ordem da parada · linha = caminho do passeio
+                </p>
                 <div id="lista-roteiro" class="lista-roteiro-ordenavel"></div>
                 <div id="acoes-roteiro" class="acoes-roteiro" hidden>
-                    <a href="index.html#explorar" class="btn btn-primary" data-i18n="ver_mapa">Ver no mapa</a>
+                    <a href="index.html#explorar" class="btn btn-primary" data-i18n="ver_mapa">Ver no Explorar</a>
                 </div>
             </div>
         </section>
@@ -72,7 +80,9 @@
     <script src="js/config.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/area.js"></script>
     <script src="js/roteiro.js"></script>
+    <script src="js/mapa.js"></script>
     <script src="js/roteiro-pagina.js"></script>
 </body>
 

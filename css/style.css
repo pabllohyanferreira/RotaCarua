@@ -326,8 +326,18 @@ input {
 }
 
 .pin-leaflet {
-    background: transparent;
-    border: none;
+    background: transparent !important;
+    border: none !important;
+}
+
+.pin-leaflet-parada {
+    z-index: 800 !important;
+}
+
+.mapa-roteiro {
+    margin: 16px 0 8px;
+    min-height: 280px;
+    height: 42vh;
 }
 
 .pin-bola,

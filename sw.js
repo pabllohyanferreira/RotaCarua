@@ -1,4 +1,4 @@
-var CACHE = 'rota-carua-v17';
+var CACHE = 'rota-carua-v21';
 
 self.addEventListener('install', function (e) {
     self.skipWaiting();
@@ -59,6 +59,7 @@ self.addEventListener('fetch', function (e) {
         url.indexOf('googleapis.com') !== -1 ||
         url.indexOf('gstatic.com') !== -1 ||
         url.indexOf('openstreetmap.org') !== -1 ||
+        url.indexOf('nominatim.openstreetmap.org') !== -1 ||
         url.indexOf('overpass-api.de') !== -1 ||
         url.indexOf('unpkg.com') !== -1
     ) {
