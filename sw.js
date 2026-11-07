@@ -1,4 +1,4 @@
-var CACHE = 'rota-carua-v15';
+var CACHE = 'rota-carua-v16';
 
 self.addEventListener('install', function (e) {
     self.skipWaiting();
